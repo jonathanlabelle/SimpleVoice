@@ -33,7 +33,7 @@ class Users(UserMixin, db.Model):
         return '<User {}>'.format(self.username)
 
 
-class Clients(Base):
+class Clients(db.Model):
     __tablename__ = "Clients"
     client_id = db.Column(db.Integer, autoincrement=True)
     name = db.Column(db.VARCHAR(length=255))
@@ -48,7 +48,7 @@ class Clients(Base):
     )
 
 
-class Invoices(Base):
+class Invoices(db.Model):
     __tablename__ = "Invoices"
     invoice_id = Column(Integer)
     client_id = Column(Integer, ForeignKey("Clients.client_id"))
@@ -61,7 +61,7 @@ class Invoices(Base):
     )
 
 
-class Items(Base):
+class Items(db.Model):
     __tablename__ = "Items"
     item_id = db.Column(db.Integer, nullable=False)
     item_name = db.Column(db.VARCHAR(length=100), nullable=False)
@@ -74,7 +74,7 @@ class Items(Base):
     )
 
 
-class InvoicesLines(Base):
+class InvoicesLines(db.Model):
     __tablename__ = "Invoices_lines"
     invoice_id = db.Column(db.Integer, ForeignKey("Invoices.invoice_id"))
     client_id = db.Column(db.Integer, ForeignKey("Clients.client_id"))
@@ -89,10 +89,3 @@ class InvoicesLines(Base):
                              ['Invoices.invoice_id', 'Clients.client_id', 'Users.id']),
         PrimaryKeyConstraint(invoice_id, item_id, user),
     )
-
-
-if __name__ == '__main__':
-    engine.execute("DROP DATABASE SimpleVoice")
-    engine.execute("CREATE DATABASE SimpleVoice")
-    Base.metadata.create_all(engine)
-    #engine.execute("DROP DATABASE SimpleVoice")
