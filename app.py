@@ -1,18 +1,16 @@
-
-import flask
-import flask_login
-import sqlalchemy as sqlalchemy
-from flask import Flask, render_template, request, redirect, url_for
+import sqlalchemy
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import sessionmaker, scoped_session
 
-from model import Users, Base, session
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from forms import LogInForm, SignupForm
 
+from model import app, db, create_db, Users
 
-app = Flask(__name__)
-app.secret_key = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
+engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
+login_manager = LoginManager()
+Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = scoped_session(Session)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -24,12 +22,32 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        user = Users.query.filter_by(username=username).first()
-        login_user(user)
-        return redirect(url_for('home'))
-    return render_template('login.html')
+    form = LogInForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(username=form.loginName.data).first()
+        if user and user.check_password(password=form.password.data):
+            login_user(user)
+            return redirect(url_for('home'))
+        flash('invalid username/password combination')
+    return render_template('login.html', form=form)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    if form.validate_on_submit():
+        username = form.loginName.data
+        existing_user = session.query(Users).filter_by(username=username).first()
+        if existing_user is None:
+            user = Users(username=form.loginName.data, companyName=form.companyName.data)
+            user.set_password(form.password.data)
+            session.add(user)
+            session.commit()
+            login_user(user)
+            return redirect(url_for('home'))
+        else:
+            flash('User ' + form.loginName.data + ' already exists')
+    return render_template('signup.html', form=form)
 
 
 @app.route('/logout')
@@ -42,20 +60,10 @@ def logout():
 @app.route('/index')
 @login_required
 def home():
-    user = flask_login.current_user
+    user = current_user
     return render_template('home.html', user=user)
 
 
-def info():
-    user = Users(username='vice', password='pattes')
-    session.add(user)
-    Users.add(user)
-    session.commit()
-    user = Users.query.filter_by(id=id).first()
-    print(user.username)
-
-
 if __name__ == '__main__':
-    user = Users.query.filter_by(id=1).first()
-    print(user)
+    create_db()
 

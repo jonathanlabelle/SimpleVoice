@@ -1,24 +1,26 @@
 import sqlalchemy
-from sqlalchemy import Integer, Column, VARCHAR, ForeignKey, Numeric, PrimaryKeyConstraint, ForeignKeyConstraint, insert
-from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
+from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Integer, Column, VARCHAR, ForeignKey, Numeric, PrimaryKeyConstraint, ForeignKeyConstraint
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
-engine.execute("USE SimpleVoice")
-Base = declarative_base()
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = scoped_session(Session)
-Base.query = session.query_property()
+app = Flask(__name__)
+app.config['SECRET_KEY'] = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
+Bootstrap(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/SimpleVoice'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-from . import db
+db = SQLAlchemy(app)
 
 
 class Users(UserMixin, db.Model):
     __tablename__ = "Users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.VARCHAR(100), nullable=False, unique=True)
-    password = db.Column(db.VARCHAR(200), nullable=False)
+    companyName = db.Column(db.VARCHAR(200), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
     def set_password(self, password):
         self.password = generate_password_hash(
@@ -89,3 +91,12 @@ class InvoicesLines(db.Model):
                              ['Invoices.invoice_id', 'Clients.client_id', 'Users.id']),
         PrimaryKeyConstraint(invoice_id, item_id, user),
     )
+
+
+def create_db():
+    engine = sqlalchemy.create_engine('mysql://root:root@localhost')  # connect to server
+    engine.execute("CREATE DATABASE IF NOT EXISTS simplevoice;")
+    engine.execute("USE simplevoice;")
+    db.create_all()
+    db.session.commit()
+
