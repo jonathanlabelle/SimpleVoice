@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Create Client</h1>
+<form method="POST" action="/create_client">
+    {{ form.csrf_token }}
+    <fieldset class="clientName">
+        {{ form.clientName.label }}
+        {{ form.clientName(placeholder='Client name') }}
+
+        {% if form.clientName.errors %}
+          <ul class="errors">
+            {% for error in form.clientName.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+    <fieldset class="clientEmail">
+        {{ form.clientEmail.label }}
+        {{ form.clientEmail(placeholder='Client email') }}
+
+        {% if form.clientEmail.errors %}
+          <ul class="errors">
+            {% for error in form.clientEmail.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+    <fieldset class="clientPhone">
+        {{ form.clientPhone.label }}
+        {{ form.clientPhone(placeholder='Client name') }}
+
+        {% if form.clientPhone.errors %}
+          <ul class="errors">
+            {% for error in form.clientPhone.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+    <fieldset class="clientReference">
+        {{ form.clientReference.label }}
+        {{ form.clientReference(placeholder='Client name') }}
+
+        {% if form.clientReference.errors %}
+          <ul class="errors">
+            {% for error in form.clientReference.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}
