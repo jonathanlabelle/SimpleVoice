@@ -38,3 +38,18 @@ class EditClientInformationForm(FlaskForm):
     clientPhone = StringField('Client phone number', validators=[Length(min=10, max=10), Optional()])
     clientReference = StringField('Client reference person', validators=[Optional()])
     submit = SubmitField('Edit client')
+
+
+class CreateInvoiceForm(FlaskForm):
+    client_id = IntegerField('Client ID', validators=[DataRequired()])
+    submit = SubmitField('Create Invoice')
+
+
+class EditInvoiceGetIDForm(FlaskForm):
+    invoice_id = IntegerField('Invoice ID', validators=[Optional()])
+    submit = SubmitField('Create Invoice')
+
+
+class EditInvoiceInformationForm(FlaskForm):
+    client_id = IntegerField('New client ID', validators=[Optional()])
+    submit = SubmitField('Create Invoice')

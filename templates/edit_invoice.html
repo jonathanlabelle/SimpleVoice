@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Edit Invoice</h1>
+<form method="POST" action="/edit_invoice">
+    {{ form.csrf_token }}
+    <fieldset class="invoice_id">
+        {{ form.invoice_id.label }}
+        {{ form.invoice_id(placeholder='Number of the invoice to edit') }}
+
+        {% if form.invoice_id.errors %}
+          <ul class="errors">
+            {% for error in form.invoice_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}

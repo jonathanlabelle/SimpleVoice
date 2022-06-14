@@ -2,7 +2,7 @@
 {% block content %}
 
 <h1>Edit Client {{ client.client_id }}</h1>
-<form method="POST" action="/edit_client_information_update/<{{client.client_id}}>">
+<form method="POST" action="/edit_client_information_update/{{client.client_id}}">
     {{ form.csrf_token }}
     <fieldset class="clientName">
         {{ form.clientName.label }}

@@ -52,7 +52,7 @@ class Clients(db.Model):
 
 class Invoices(db.Model):
     __tablename__ = "Invoices"
-    invoice_id = Column(Integer)
+    invoice_id = Column(Integer, autoincrement=True)
     client_id = Column(Integer, ForeignKey("Clients.client_id"))
     total = Column(Numeric(7, 2))
     user = Column(Integer, ForeignKey("Users.id"))

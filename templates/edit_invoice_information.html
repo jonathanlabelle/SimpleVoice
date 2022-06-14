@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Edit invoice {{ invoice.invoice_id }}</h1>
+<form method="POST" action="/edit_invoice_information_update/{{invoice.invoice_id}}>">
+    {{ form.csrf_token }}
+    <fieldset class="client_id">
+        {{ form.client_id.label }}
+        {{ form.client_id(placeholder=current_client) }}
+
+        {% if form.client_id.errors %}
+          <ul class="errors">
+            {% for error in form.client_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}
