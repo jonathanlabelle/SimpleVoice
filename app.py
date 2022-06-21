@@ -4,9 +4,10 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from forms import LogInForm, SignupForm, CreateClientForm, EditClientGetIDForm, EditClientInformationForm, \
-    CreateInvoiceForm, EditInvoiceGetIDForm, EditInvoiceInformationForm
+    CreateInvoiceForm, EditInvoiceGetIDForm, EditInvoiceInformationForm, CreateItemForm, EditItemGetIDForm, \
+    EditItemInformationForm
 
-from model import app, db, create_db, Users, Clients, Invoices
+from model import app, db, create_db, Users, Clients, Invoices, Items
 
 engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
 login_manager = LoginManager()
@@ -170,11 +171,60 @@ def edit_invoice_information():
 @app.route('/edit_invoice_information_update/<invoice_id>', methods=['POST'])
 @login_required
 def edit_invoice_information_update(invoice_id):
-    print(invoice_id)
     invoice = Invoices.query.filter_by(invoice_id=invoice_id).first()
     form = EditInvoiceInformationForm()
     if form.client_id.data:
         invoice.client_id = form.client_id.data
+    db.session.commit()
+    return redirect(url_for('home'))
+
+
+@app.route('/create_item', methods=['POST', 'GET'])
+@login_required
+def create_item():
+    form = CreateItemForm()
+    if form.validate_on_submit():
+        item = Items(item_name=form.item_name.data, item_price=form.item_price.data, user=current_user.id)
+        session.add(item)
+        session.commit()
+        return redirect(url_for('home'))
+    return render_template('create_item.html', form=form)
+
+
+@app.route('/edit_item', methods=['POST', 'GET'])
+@login_required
+def edit_item_get_id():
+    form = EditItemGetIDForm()
+    if form.validate_on_submit():
+        item = Items.query.filter_by(item_id=form.item_id.data).first()
+        if item.user == current_user.id:
+            return redirect(url_for('edit_item_information', item_id=item.item_id))
+        else:
+            flash("Item {} doesn't exists".format(form.item_id.data))
+    return render_template('edit_item.html', form=form)
+
+
+@app.route('/edit_item_information', methods=['POST', 'GET'])
+@login_required
+def edit_item_information():
+    item_id = int(request.args.get('item_id'))
+    item = Items.query.filter_by(item_id=item_id).first()
+    form = EditItemInformationForm()
+    if request.method == 'GET':
+        return render_template('edit_item_information.html', item=item, form=form)
+    if form.validate_on_submit():
+        return redirect(url_for('home'))
+
+
+@app.route('/edit_item_information_update/<item_id>', methods=['POST'])
+@login_required
+def edit_item_information_update(item_id):
+    item = Items.query.filter_by(item_id=item_id).first()
+    form = EditItemInformationForm()
+    if form.item_name.data:
+        item.item_name = form.item_name.data
+    if form.item_price.data:
+        item.item_price = form.item_price.data
     db.session.commit()
     return redirect(url_for('home'))
 
@@ -188,4 +238,4 @@ def test():
 
 
 if __name__ == '__main__':
-    print('allo')
+    create_db()

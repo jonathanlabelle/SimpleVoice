@@ -65,7 +65,7 @@ class Invoices(db.Model):
 
 class Items(db.Model):
     __tablename__ = "Items"
-    item_id = db.Column(db.Integer, nullable=False)
+    item_id = db.Column(db.Integer, nullable=False, autoincrement=True)
     item_name = db.Column(db.VARCHAR(length=100), nullable=False)
     item_price = db.Column(db.Numeric(7, 2), nullable=False)
     user = db.Column(db.Integer, ForeignKey("Users.id"))
@@ -94,7 +94,7 @@ class InvoicesLines(db.Model):
 
 
 def create_db():
-    engine = sqlalchemy.create_engine('mysql://root:root@localhost')  # connect to server
+    engine = sqlalchemy.create_engine('mysql://root:root@localhost')
     engine.execute("CREATE DATABASE IF NOT EXISTS simplevoice;")
     engine.execute("USE simplevoice;")
     db.create_all()

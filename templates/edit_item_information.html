@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Edit Item {{ item.item_id }} - {{ item.item_name }} : {{ item.item_price }} </h1>
+<form method="POST" action="/edit_item_information_update/{{item.item_id}}">
+    {{ form.csrf_token }}
+    <fieldset class="itemName">
+        {{ form.item_name.label }}
+        {{ form.item_name(placeholder='Item name') }}
+
+        {% if form.item_name.errors %}
+          <ul class="errors">
+            {% for error in form.item_name.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="itemPrice">
+        {{ form.item_price.label }}
+        {{ form.item_price(placeholder='Item price') }}
+
+        {% if form.item_price.errors %}
+          <ul class="errors">
+            {% for error in form.item_price.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}

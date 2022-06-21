@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Edit Item</h1>
+<form method="POST" action="/edit_item">
+    {{ form.csrf_token }}
+    <fieldset class="item_id">
+        {{ form.item_id.label }}
+        {{ form.item_id(placeholder='Number of the item to edit') }}
+
+        {% if form.item_id.errors %}
+          <ul class="errors">
+            {% for error in form.item_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}

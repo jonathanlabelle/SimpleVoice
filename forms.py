@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField, FloatField
 from wtforms.validators import InputRequired, DataRequired, Length, EqualTo, Optional
 
 
@@ -47,9 +47,26 @@ class CreateInvoiceForm(FlaskForm):
 
 class EditInvoiceGetIDForm(FlaskForm):
     invoice_id = IntegerField('Invoice ID', validators=[Optional()])
-    submit = SubmitField('Create Invoice')
+    submit = SubmitField('Edit invoice')
 
 
 class EditInvoiceInformationForm(FlaskForm):
     client_id = IntegerField('New client ID', validators=[Optional()])
-    submit = SubmitField('Create Invoice')
+    submit = SubmitField('Edit invoice')
+
+
+class CreateItemForm(FlaskForm):
+    item_name = StringField('Item name', validators=[DataRequired()])
+    item_price = FloatField('Item price', validators=[DataRequired()])
+    submit = SubmitField('Create Item')
+
+
+class EditItemGetIDForm(FlaskForm):
+    item_id = IntegerField('Item ID', validators=[Optional()])
+    submit = SubmitField('Edit item')
+
+
+class EditItemInformationForm(FlaskForm):
+    item_name = StringField('Item name', validators=[Optional()])
+    item_price = FloatField('Item price', validators=[Optional()])
+    submit = SubmitField('Edit item')
