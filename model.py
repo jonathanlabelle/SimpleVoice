@@ -92,10 +92,29 @@ class InvoicesLines(db.Model):
     )
 
 
+trigger_insert_invoice_line_total = "CREATE TRIGGER insert_invoice_line_total_trigger AFTER INSERT ON invoices_lines " \
+                                    "FOR EACH ROW UPDATE invoices I SET total =(SELECT SUM(quantity*price) " \
+                                    "FROM invoices_lines IL WHERE I.invoice_id = IL.invoice_id) " \
+                                    "WHERE I.invoice_id = New.invoice_id;"
+
+trigger_update_invoice_line_total = "CREATE TRIGGER update_invoice_line_total_trigger AFTER UPDATE ON invoices_lines " \
+                                    "FOR EACH ROW UPDATE invoices I SET total =(SELECT SUM(quantity*price) " \
+                                    "FROM invoices_lines IL WHERE I.invoice_id = IL.invoice_id) " \
+                                    "WHERE I.invoice_id = New.invoice_id;"
+
+trigger_delete_invoice_line_total = "CREATE TRIGGER delete_invoice_line_total_trigger AFTER DELETE ON invoices_lines " \
+                                    "FOR EACH ROW UPDATE invoices I SET total =(SELECT SUM(quantity*price) " \
+                                    "FROM invoices_lines IL WHERE I.invoice_id = IL.invoice_id) " \
+                                    "WHERE I.invoice_id = OLD.invoice_id;"
+
+
 def create_db():
     engine = sqlalchemy.create_engine('mysql://root:root@localhost')
     engine.execute("CREATE DATABASE IF NOT EXISTS simplevoice;")
     engine.execute("USE simplevoice;")
     db.create_all()
+    engine.execute(trigger_insert_invoice_line_total)
+    engine.execute(trigger_update_invoice_line_total)
+    engine.execute(trigger_delete_invoice_line_total)
     db.session.commit()
 
