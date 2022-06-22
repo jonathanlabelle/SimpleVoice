@@ -5,9 +5,13 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from forms import LogInForm, SignupForm, CreateClientForm, EditClientGetIDForm, EditClientInformationForm, \
     CreateInvoiceForm, EditInvoiceGetIDForm, EditInvoiceInformationForm, CreateItemForm, EditItemGetIDForm, \
-    EditItemInformationForm
+    EditItemInformationForm, CreateInvoiceLines, EditInvoiceLineGetIDForm, EditInvoiceLineInformation
 
-from model import app, db, create_db, Users, Clients, Invoices, Items
+from model import app, db, create_db, Users, Clients, Invoices, Items, InvoicesLines
+from utils import check_if_item_exist, get_item_info
+
+
+#TODO INSERTS SAME ITEMS INVOICE LINES
 
 engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
 login_manager = LoginManager()
@@ -225,6 +229,93 @@ def edit_item_information_update(item_id):
         item.item_name = form.item_name.data
     if form.item_price.data:
         item.item_price = form.item_price.data
+    db.session.commit()
+    return redirect(url_for('home'))
+
+
+@app.route('/create_invoice_line', methods=['POST', 'GET'])
+@login_required
+def create_invoice_line():
+    form = CreateInvoiceLines()
+    if form.validate_on_submit():
+        invoice = Invoices.query.filter_by(invoice_id=form.invoice_id.data).first()
+        if invoice.user == current_user.id:
+            if check_if_item_exist(form.item_id_1.data, current_user.id) and form.quantity_1.data > 0:
+                item_info = get_item_info(form.item_id_1.data)
+                invoice_line_1 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_1.data,
+                                               item_name=item_info[0], price=item_info[1],
+                                               quantity=form.quantity_1.data, user=current_user.id)
+                session.add(invoice_line_1)
+                session.commit()
+                flash('First line successfully added')
+            else:
+                flash('Problem adding first line')
+            if form.item_id_2.data:
+                if check_if_item_exist(form.item_id_2.data, current_user.id) and form.quantity_2.data > 0:
+                    item_info = get_item_info(form.item_id_2.data)
+                    invoice_line_2 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_2.data,
+                                                   item_name=item_info[0], price=item_info[1],
+                                                   quantity=form.quantity_2.data, user=current_user.id)
+                    session.add(invoice_line_2)
+                    session.commit()
+                    flash('Second line successfully added')
+                else:
+                    flash('Problem adding second line')
+            if form.item_id_3.data:
+                if check_if_item_exist(form.item_id_3.data, current_user.id) and form.quantity_3.data > 0:
+                    item_info = get_item_info(form.item_id_3.data)
+                    invoice_line_3 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_3.data,
+                                                   item_name=item_info[0], price=item_info[1],
+                                                   quantity=form.quantity_3.data, user=current_user.id)
+                    session.add(invoice_line_3)
+                    session.commit()
+                    flash('Third line successfully added')
+                else:
+                    flash('Problem adding third line')
+            return redirect(url_for('create_invoice_line'))
+        else:
+            flash("Invoice doesn't exist")
+    return render_template('create_invoice_line.html', form=form)
+
+
+@app.route('/edit_invoice_line', methods=['POST', 'GET'])
+@login_required
+def edit_invoice_line_get_id():
+    form = EditInvoiceLineGetIDForm()
+    if form.validate_on_submit():
+        invoice_line = InvoicesLines.query.filter_by(item_id=form.item_id.data, invoice_id=form.invoice_id.data).first()
+        if invoice_line.user == current_user.id:
+            return redirect(url_for('edit_invoice_line_information', item_id=form.item_id.data,
+                                    invoice_id=form.invoice_id.data))
+        else:
+            flash("Invoice line doesn't exists".format(form.item_id.data))
+    return render_template('edit_invoice_line.html', form=form)
+
+
+@app.route('/edit_invoice_line_information', methods=['POST', 'GET'])
+@login_required
+def edit_invoice_line_information():
+    item_id = int(request.args.get('item_id'))
+    invoice_id = int(request.args.get('invoice_id'))
+    invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+    form = EditInvoiceLineInformation()
+    if request.method == 'GET':
+        return render_template('edit_invoice_line_information.html', invoice_line=invoice_line, form=form)
+    if form.validate_on_submit():
+        return redirect(url_for('home'))
+
+
+@app.route('/edit_invoice_line_information_update/<invoice_id>&<item_id>', methods=['POST'])
+@login_required
+def edit_invoice_line_information_update(invoice_id, item_id):
+    invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+    form = EditInvoiceLineInformation()
+    if form.item_name.data:
+        invoice_line.item_name = form.item_name.data
+    if form.quantity.data:
+        invoice_line.quantity = form.quantity.data
+    if form.item_price.data:
+        invoice_line.price = form.item_price.data
     db.session.commit()
     return redirect(url_for('home'))
 

@@ -79,9 +79,8 @@ class Items(db.Model):
 class InvoicesLines(db.Model):
     __tablename__ = "Invoices_lines"
     invoice_id = db.Column(db.Integer, ForeignKey("Invoices.invoice_id"))
-    client_id = db.Column(db.Integer, ForeignKey("Clients.client_id"))
-    name = db.Column(db.VARCHAR(length=100))
     item_id = db.Column(db.Integer)
+    item_name = db.Column(db.VARCHAR(length=100))
     quantity = db.Column(db.Integer)
     price = db.Column(db.Numeric(7, 2))
     user = db.Column(db.Integer, ForeignKey("Users.id"))

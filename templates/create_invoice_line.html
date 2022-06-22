@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Create Invoice</h1>
+<form method="POST" action="/create_invoice_line">
+    {{ form.csrf_token }}
+    <fieldset class="item_name">
+        {{ form.invoice_id.label }}
+        {{ form.invoice_id(placeholder='Invoice ID') }}
+
+        {% if form.invoice_id.errors %}
+          <ul class="errors">
+            {% for error in form.invoice_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="item_id_1">
+        {{ form.item_id_1.label }}
+        {{ form.item_id_1(placeholder='Item id') }}
+
+        {% if form.item_id_1.errors %}
+          <ul class="errors">
+            {% for error in form.item_id_1.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="quantity_1">
+        {{ form.quantity_1.label }}
+        {{ form.quantity_1(placeholder='Quantity') }}
+
+        {% if form.quantity_1.errors %}
+          <ul class="errors">
+            {% for error in form.quantity_1.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="item_id_2">
+        {{ form.item_id_2.label }}
+        {{ form.item_id_2(placeholder='Item id') }}
+
+        {% if form.item_id_2.errors %}
+          <ul class="errors">
+            {% for error in form.item_id_2.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="quantity_2">
+        {{ form.quantity_2.label }}
+        {{ form.quantity_2(placeholder='Quantity') }}
+
+        {% if form.quantity_2.errors %}
+          <ul class="errors">
+            {% for error in form.quantity_2.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="item_id_3">
+        {{ form.item_id_3.label }}
+        {{ form.item_id_3(placeholder='Item id') }}
+
+        {% if form.item_id_3.errors %}
+          <ul class="errors">
+            {% for error in form.item_id_31.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="quantity_3">
+        {{ form.quantity_3.label }}
+        {{ form.quantity_3(placeholder='Quantity') }}
+
+        {% if form.quantity_3.errors %}
+          <ul class="errors">
+            {% for error in form.quantity_3.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}

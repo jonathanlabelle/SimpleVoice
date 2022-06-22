@@ -70,3 +70,27 @@ class EditItemInformationForm(FlaskForm):
     item_name = StringField('Item name', validators=[Optional()])
     item_price = FloatField('Item price', validators=[Optional()])
     submit = SubmitField('Edit item')
+
+
+class CreateInvoiceLines(FlaskForm):
+    invoice_id = IntegerField('Invoice ID', validators=[DataRequired()])
+    item_id_1 = IntegerField('Item ID', validators=[DataRequired()])
+    quantity_1 = IntegerField('Quantity', validators=[Optional()])
+    item_id_2 = IntegerField('Item ID', validators=[Optional()])
+    quantity_2 = IntegerField('Quantity', validators=[Optional()])
+    item_id_3 = IntegerField('Item ID', validators=[Optional()])
+    quantity_3 = IntegerField('Quantity', validators=[Optional()])
+    submit = SubmitField('Add invoice lines')
+
+
+class EditInvoiceLineGetIDForm(FlaskForm):
+    invoice_id = IntegerField('Invoice ID', validators=[DataRequired()])
+    item_id = IntegerField('Item ID', validators=[DataRequired()])
+    submit = SubmitField('Edit item')
+
+
+class EditInvoiceLineInformation(FlaskForm):
+    item_name = StringField('Item name', validators=[Optional()])
+    item_price = FloatField('Item price', validators=[Optional()])
+    quantity = IntegerField('Quantity', validators=[Optional()])
+    submit = SubmitField('Edit invoice line')

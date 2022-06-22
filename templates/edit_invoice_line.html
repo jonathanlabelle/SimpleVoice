@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Edit invoice line</h1>
+<form method="POST" action="/edit_invoice_line">
+    {{ form.csrf_token }}
+    <fieldset class="invoice_id">
+        {{ form.invoice_id.label }}
+        {{ form.invoice_id(placeholder='Invoice ID') }}
+
+        {% if form.invoice_id.errors %}
+          <ul class="errors">
+            {% for error in form.invoice_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="item_id">
+        {{ form.item_id.label }}
+        {{ form.item_id(placeholder='Item ID') }}
+
+        {% if form.item_id.errors %}
+          <ul class="errors">
+            {% for error in form.item_id.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    </fieldset>
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}
