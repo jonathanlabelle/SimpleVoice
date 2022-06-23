@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField, FloatField, \
+    BooleanField
 from wtforms.validators import InputRequired, DataRequired, Length, EqualTo, Optional
 
 
@@ -45,7 +46,7 @@ class CreateInvoiceForm(FlaskForm):
     submit = SubmitField('Create Invoice')
 
 
-class EditInvoiceGetIDForm(FlaskForm):
+class GetIDInvoiceForm(FlaskForm):
     invoice_id = IntegerField('Invoice ID', validators=[Optional()])
     submit = SubmitField('Edit invoice')
 
@@ -61,7 +62,7 @@ class CreateItemForm(FlaskForm):
     submit = SubmitField('Create Item')
 
 
-class EditItemGetIDForm(FlaskForm):
+class GetIDItemForm(FlaskForm):
     item_id = IntegerField('Item ID', validators=[Optional()])
     submit = SubmitField('Edit item')
 
@@ -83,7 +84,7 @@ class CreateInvoiceLines(FlaskForm):
     submit = SubmitField('Add invoice lines')
 
 
-class EditInvoiceLineGetIDForm(FlaskForm):
+class GetInvoiceLineIDForm(FlaskForm):
     invoice_id = IntegerField('Invoice ID', validators=[DataRequired()])
     item_id = IntegerField('Item ID', validators=[DataRequired()])
     submit = SubmitField('Edit item')
@@ -94,3 +95,7 @@ class EditInvoiceLineInformation(FlaskForm):
     item_price = FloatField('Item price', validators=[Optional()])
     quantity = IntegerField('Quantity', validators=[Optional()])
     submit = SubmitField('Edit invoice line')
+
+
+class ConfirmationForm(FlaskForm):
+    submit = SubmitField('Confirm')

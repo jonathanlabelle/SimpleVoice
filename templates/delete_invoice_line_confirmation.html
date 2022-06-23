@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Do you wish to delete . Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
+<form method="POST" action="/delete_invoice_line_confirmation_delete/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
+    {{ form.csrf_token }}
+
+    <div class="submit-button">
+        {{ form.submit }}
+    </div>
+    <div class="not-submit">
+        <a href="{{url_for('home')}}"><button>Don't delete</button></a>
+    </div>
+</form>
+{% endblock %}

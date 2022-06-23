@@ -4,8 +4,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from forms import LogInForm, SignupForm, CreateClientForm, EditClientGetIDForm, EditClientInformationForm, \
-    CreateInvoiceForm, EditInvoiceGetIDForm, EditInvoiceInformationForm, CreateItemForm, EditItemGetIDForm, \
-    EditItemInformationForm, CreateInvoiceLines, EditInvoiceLineGetIDForm, EditInvoiceLineInformation
+    CreateInvoiceForm, GetIDInvoiceForm, EditInvoiceInformationForm, CreateItemForm, GetIDItemForm, \
+    EditItemInformationForm, CreateInvoiceLines, GetInvoiceLineIDForm, EditInvoiceLineInformation, ConfirmationForm
 
 from model import app, db, create_db, Users, Clients, Invoices, Items, InvoicesLines
 from utils import check_if_item_exist, get_item_info
@@ -149,7 +149,7 @@ def create_invoice():
 @app.route('/edit_invoice', methods=['POST', 'GET'])
 @login_required
 def edit_invoice_get_id():
-    form = EditInvoiceGetIDForm()
+    form = GetIDInvoiceForm()
     if form.validate_on_submit():
         invoice = Invoices.query.filter_by(invoice_id=form.invoice_id.data).first()
         if invoice.user == current_user.id:
@@ -183,6 +183,51 @@ def edit_invoice_information_update(invoice_id):
     return redirect(url_for('home'))
 
 
+@app.route('/delete_invoice', methods=['GET', 'POST'])
+@login_required
+def delete_invoice():
+    form = GetIDInvoiceForm()
+    if form.validate_on_submit():
+        invoice_id = form.invoice_id.data
+        invoice = Invoices.query.filter_by(invoice_id=invoice_id).first()
+        if invoice:
+            if invoice.user == current_user.id:
+                return redirect(url_for('delete_invoice_confirmation', invoice_id=invoice_id))
+        else:
+            flash('Invoice does not exist')
+    return render_template('delete_invoice.html', form=form)
+
+
+@app.route('/delete_invoice_confirmation', methods=['GET', 'POST'])
+@login_required
+def delete_invoice_confirmation():
+    message = "Safe to delete, invoice is empty"
+    invoice_id = int(request.args.get('invoice_id'))
+    invoice = Invoices.query.filter_by(invoice_id=invoice_id).first()
+    if InvoicesLines.query.filter_by(invoice_id=invoice_id).first():
+        message = "Caution: Invoice is not empty, all lines will be deleted"
+    form = ConfirmationForm()
+    return render_template('delete_invoice_confirmation.html', invoice=invoice, form=form, message=message)
+
+
+@app.route('/delete_invoice_confirmation_delete/<invoice_id>', methods=['POST'])
+@login_required
+def delete_invoice_confirmation_delete(invoice_id):
+    invoice = Invoices.query.filter_by(invoice_id=invoice_id).first()
+    if invoice.user == current_user.id:
+        invoice_lines = InvoicesLines.query.filter_by(invoice_id=invoice_id).all()
+        if invoice_lines:
+            for invoice_line in invoice_lines:
+                db.session.delete(invoice_line)
+                db.session.commit()
+        db.session.delete(invoice)
+        db.session.commit()
+        flash('Invoice deleted')
+    else:
+        flash('Problem deleting the invoice')
+    return redirect(url_for('home'))
+
+
 @app.route('/create_item', methods=['POST', 'GET'])
 @login_required
 def create_item():
@@ -198,7 +243,7 @@ def create_item():
 @app.route('/edit_item', methods=['POST', 'GET'])
 @login_required
 def edit_item_get_id():
-    form = EditItemGetIDForm()
+    form = GetIDItemForm()
     if form.validate_on_submit():
         item = Items.query.filter_by(item_id=form.item_id.data).first()
         if item.user == current_user.id:
@@ -230,6 +275,43 @@ def edit_item_information_update(item_id):
     if form.item_price.data:
         item.item_price = form.item_price.data
     db.session.commit()
+    return redirect(url_for('home'))
+
+
+@app.route('/delete_item', methods=['GET', 'POST'])
+@login_required
+def delete_item():
+    form = GetIDItemForm()
+    if form.validate_on_submit():
+        item_id = form.item_id.data
+        item = Items.query.filter_by(item_id=item_id).first()
+        if item:
+            if item.user == current_user.id:
+                return redirect(url_for('delete_item_confirmation', item_id=item_id))
+        else:
+            flash('Item does not exist')
+    return render_template('delete_item.html', form=form)
+
+
+@app.route('/delete_item_confirmation', methods=['GET', 'POST'])
+@login_required
+def delete_item_confirmation():
+    item_id = int(request.args.get('item_id'))
+    item = Items.query.filter_by(item_id=item_id).first()
+    form = ConfirmationForm()
+    return render_template('delete_item_confirmation.html', item=item, form=form)
+
+
+@app.route('/delete_item_confirmation_delete/<item_id>', methods=['POST'])
+@login_required
+def delete_item_confirmation_delete(item_id):
+    item = Items.query.filter_by(item_id=item_id).first()
+    if item.user == current_user.id:
+        db.session.delete(item)
+        db.session.commit()
+        flash('Item deleted')
+    else:
+        flash('Problem deleting the item')
     return redirect(url_for('home'))
 
 
@@ -281,7 +363,7 @@ def create_invoice_line():
 @app.route('/edit_invoice_line', methods=['POST', 'GET'])
 @login_required
 def edit_invoice_line_get_id():
-    form = EditInvoiceLineGetIDForm()
+    form = GetInvoiceLineIDForm()
     if form.validate_on_submit():
         invoice_line = InvoicesLines.query.filter_by(item_id=form.item_id.data, invoice_id=form.invoice_id.data).first()
         if invoice_line.user == current_user.id:
@@ -320,6 +402,52 @@ def edit_invoice_line_information_update(invoice_id, item_id):
     return redirect(url_for('home'))
 
 
+@app.route('/delete_invoice_line', methods=['GET', 'POST'])
+@login_required
+def delete_invoice_line():
+    form = GetInvoiceLineIDForm()
+    if form.validate_on_submit():
+        invoice_id = form.invoice_id.data
+        item_id = form.item_id.data
+        invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+        if invoice_line:
+            if invoice_line.user == current_user.id:
+                return redirect(url_for('delete_invoice_line_confirmation', invoice_id=invoice_id, item_id=item_id))
+        else:
+            flash('Invoice line does not exist')
+    return render_template('delete_invoice_line.html', form=form)
+
+
+@app.route('/delete_invoice_line_confirmation', methods=['GET', 'POST'])
+@login_required
+def delete_invoice_line_confirmation():
+    item_id = int(request.args.get('item_id'))
+    invoice_id = int(request.args.get('invoice_id'))
+    invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+    form = ConfirmationForm()
+    if form.validate_on_submit():
+        if invoice_line.user == current_user.user:
+            db.session.delete(invoice_line)
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            flash('Problem deleting the invoice')
+    return render_template('delete_invoice_line_confirmation.html', invoice_line=invoice_line, form=form)
+
+
+@app.route('/delete_invoice_line_confirmation_delete/<invoice_id>&<item_id>', methods=['POST'])
+@login_required
+def delete_invoice_line_information_delete(invoice_id, item_id):
+    invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+    if invoice_line.user == current_user.id:
+        db.session.delete(invoice_line)
+        db.session.commit()
+        flash('Invoice line deleted')
+    else:
+        flash('Problem deleting the invoice')
+    return redirect(url_for('home'))
+
+
 @app.route('/test', methods=['POST'])
 @login_required
 def test():
@@ -330,3 +458,4 @@ def test():
 
 if __name__ == '__main__':
     create_db()
+
