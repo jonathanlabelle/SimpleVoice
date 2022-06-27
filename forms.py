@@ -23,14 +23,14 @@ class LogInForm(FlaskForm):
 class CreateClientForm(FlaskForm):
     clientName = StringField('Client Name', validators=[DataRequired()])
     clientEmail = EmailField('Client e-mail', validators=[DataRequired(), validators.Email()])
-    clientPhone = StringField('Client phone number',validators=[DataRequired(), Length(min=10, max=10)])
+    clientPhone = StringField('Client phone number', validators=[DataRequired(), Length(min=10, max=10)])
     clientReference = StringField('Client reference person', validators=[DataRequired()])
-    submit = SubmitField('Create account')
+    submit = SubmitField('Create client')
 
 
-class EditClientGetIDForm(FlaskForm):
-    clientID = IntegerField('Client ID', validators=[DataRequired()])
-    submit = SubmitField('Edit client')
+class GetIDClientForm(FlaskForm):
+    client_id = IntegerField('Client ID', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 
 class EditClientInformationForm(FlaskForm):

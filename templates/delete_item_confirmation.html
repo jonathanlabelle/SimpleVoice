@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+
+
 <h1>Do you wish to delete : Name: {{item.item_name}} - Price: {{item.item_price}}</h1>
 <form method="POST" action="/delete_item_confirmation_delete/{{item.item_id}}">
     {{ form.csrf_token }}

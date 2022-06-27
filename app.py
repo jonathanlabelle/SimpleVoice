@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from forms import LogInForm, SignupForm, CreateClientForm, EditClientGetIDForm, EditClientInformationForm, \
+from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, EditClientInformationForm, \
     CreateInvoiceForm, GetIDInvoiceForm, EditInvoiceInformationForm, CreateItemForm, GetIDItemForm, \
     EditItemInformationForm, CreateInvoiceLines, GetInvoiceLineIDForm, EditInvoiceLineInformation, ConfirmationForm
 
@@ -39,6 +39,12 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
@@ -55,13 +61,6 @@ def signup():
         else:
             flash('User ' + form.loginName.data + ' already exists')
     return render_template('signup.html', form=form)
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return "logged out"
 
 
 @app.route('/index')
@@ -82,20 +81,71 @@ def create_client():
         session.add(client)
         session.commit()
         return redirect(url_for('home'))
-    return render_template('create_client.html', form=form)
+
+    return render_template('create_client.html', form=form, user=current_user)
+
+
+@app.route('/delete_client', methods=['GET', 'POST'])
+@login_required
+def delete_client():
+    form = GetIDClientForm()
+    if form.validate_on_submit():
+        client_id = form.client_id.data
+        client = Clients.query.filter_by(client_id=client_id).first()
+        if client:
+            if client.user == current_user.id:
+                return redirect(url_for('delete_client_confirmation', client_id=client_id))
+        else:
+            flash('Client does not exist')
+    return render_template('delete_client.html', form=form, user=current_user)
+
+
+@app.route('/delete_client_confirmation', methods=['GET', 'POST'])
+@login_required
+def delete_client_confirmation():
+    message = "Safe to delete, no invoices associated with the client"
+    client_id = int(request.args.get('client_id'))
+    client = Clients.query.filter_by(client_id=client_id).first()
+    if Invoices.query.filter_by(client_id=client_id).first():
+        message = "Caution: Client still has invoices, they will be deleted if the client is deleted"
+    form = ConfirmationForm()
+    return render_template('delete_client_confirmation.html', client=client, form=form, message=message, user=current_user)
+
+
+@app.route('/delete_client_confirmation_delete/<client_id>', methods=['POST'])
+@login_required
+def delete_client_confirmation_delete(client_id):
+    client = Clients.query.filter_by(client_id=client_id).first()
+    if client.user == current_user.id:
+        invoices = Invoices.query.filter_by(client_id=client_id).all()
+        if invoices:
+            for invoice in invoices:
+                invoice_lines = InvoicesLines.query.filter_by(invoice_id=invoice.invoice_id).all()
+                if invoice_lines:
+                    for invoice_line in invoice_lines:
+                        db.session.delete(invoice_line)
+                        db.session.commit()
+                db.session.delete(invoice)
+                db.session.commit()
+        db.session.delete(client)
+        db.session.commit()
+        flash('Client deleted')
+    else:
+        flash('Problem deleting the client')
+    return redirect(url_for('home'))
 
 
 @app.route('/edit_client_get_id', methods=['POST', 'GET'])
 @login_required
 def edit_client_get_id():
-    form = EditClientGetIDForm()
+    form = GetIDClientForm()
     if form.validate_on_submit():
-        client = Clients.query.filter_by(client_id=form.clientID.data).first()
+        client = Clients.query.filter_by(client_id=form.client_id.data).first()
         if client.user == current_user.id:
-            return redirect(url_for('edit_client_information', client_id=form.clientID.data))
+            return redirect(url_for('edit_client_information', client_id=form.client_id.data))
         else:
-            flash("Client {} doesn't exists".format(form.clientID.data))
-    return render_template('edit_client.html', form=form)
+            flash("Client {} doesn't exists".format(form.client_id.data))
+    return render_template('edit_client.html', form=form, user=current_user)
 
 
 @app.route('/edit_client_information', methods=['POST', 'GET'])
@@ -105,7 +155,7 @@ def edit_client_information():
     client = Clients.query.filter_by(client_id=client_id).first()
     form = EditClientInformationForm()
     if request.method == 'GET':
-        return render_template('edit_client_information.html', client=client, client_id=client_id, form=form)
+        return render_template('edit_client_information.html', client=client, client_id=client_id, form=form, user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -143,7 +193,7 @@ def create_invoice():
                                                                   client_data.client_id))
         session.commit()
         return redirect(url_for('create_invoice'))
-    return render_template('create_invoice.html', form=form)
+    return render_template('create_invoice.html', form=form, user=current_user)
 
 
 @app.route('/edit_invoice', methods=['POST', 'GET'])
@@ -156,7 +206,7 @@ def edit_invoice_get_id():
             return redirect(url_for('edit_invoice_information', invoice_id=form.invoice_id.data))
         else:
             flash("Invoice {} doesn't exists".format(form.invoice_id.data))
-    return render_template('edit_invoice.html', form=form)
+    return render_template('edit_invoice.html', form=form, user=current_user)
 
 
 @app.route('/edit_invoice_information', methods=['POST', 'GET'])
@@ -167,7 +217,7 @@ def edit_invoice_information():
     form = EditInvoiceInformationForm()
     if request.method == 'GET':
         return render_template('edit_invoice_information.html', invoice=invoice, form=form,
-                               current_client='current client : {}'.format(invoice.client_id))
+                               current_client='current client : {}'.format(invoice.client_id), user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -195,7 +245,7 @@ def delete_invoice():
                 return redirect(url_for('delete_invoice_confirmation', invoice_id=invoice_id))
         else:
             flash('Invoice does not exist')
-    return render_template('delete_invoice.html', form=form)
+    return render_template('delete_invoice.html', form=form, user=current_user)
 
 
 @app.route('/delete_invoice_confirmation', methods=['GET', 'POST'])
@@ -207,7 +257,7 @@ def delete_invoice_confirmation():
     if InvoicesLines.query.filter_by(invoice_id=invoice_id).first():
         message = "Caution: Invoice is not empty, all lines will be deleted"
     form = ConfirmationForm()
-    return render_template('delete_invoice_confirmation.html', invoice=invoice, form=form, message=message)
+    return render_template('delete_invoice_confirmation.html', invoice=invoice, form=form, message=message, user=current_user)
 
 
 @app.route('/delete_invoice_confirmation_delete/<invoice_id>', methods=['POST'])
@@ -237,7 +287,7 @@ def create_item():
         session.add(item)
         session.commit()
         return redirect(url_for('home'))
-    return render_template('create_item.html', form=form)
+    return render_template('create_item.html', form=form, user=current_user)
 
 
 @app.route('/edit_item', methods=['POST', 'GET'])
@@ -250,7 +300,7 @@ def edit_item_get_id():
             return redirect(url_for('edit_item_information', item_id=item.item_id))
         else:
             flash("Item {} doesn't exists".format(form.item_id.data))
-    return render_template('edit_item.html', form=form)
+    return render_template('edit_item.html', form=form, user=current_user)
 
 
 @app.route('/edit_item_information', methods=['POST', 'GET'])
@@ -260,7 +310,7 @@ def edit_item_information():
     item = Items.query.filter_by(item_id=item_id).first()
     form = EditItemInformationForm()
     if request.method == 'GET':
-        return render_template('edit_item_information.html', item=item, form=form)
+        return render_template('edit_item_information.html', item=item, form=form, user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -290,7 +340,7 @@ def delete_item():
                 return redirect(url_for('delete_item_confirmation', item_id=item_id))
         else:
             flash('Item does not exist')
-    return render_template('delete_item.html', form=form)
+    return render_template('delete_item.html', form=form, user=current_user)
 
 
 @app.route('/delete_item_confirmation', methods=['GET', 'POST'])
@@ -299,7 +349,7 @@ def delete_item_confirmation():
     item_id = int(request.args.get('item_id'))
     item = Items.query.filter_by(item_id=item_id).first()
     form = ConfirmationForm()
-    return render_template('delete_item_confirmation.html', item=item, form=form)
+    return render_template('delete_item_confirmation.html', item=item, form=form, user=current_user)
 
 
 @app.route('/delete_item_confirmation_delete/<item_id>', methods=['POST'])
@@ -357,7 +407,7 @@ def create_invoice_line():
             return redirect(url_for('create_invoice_line'))
         else:
             flash("Invoice doesn't exist")
-    return render_template('create_invoice_line.html', form=form)
+    return render_template('create_invoice_line.html', form=form, user=current_user)
 
 
 @app.route('/edit_invoice_line', methods=['POST', 'GET'])
@@ -371,7 +421,7 @@ def edit_invoice_line_get_id():
                                     invoice_id=form.invoice_id.data))
         else:
             flash("Invoice line doesn't exists".format(form.item_id.data))
-    return render_template('edit_invoice_line.html', form=form)
+    return render_template('edit_invoice_line.html', form=form, user=current_user)
 
 
 @app.route('/edit_invoice_line_information', methods=['POST', 'GET'])
@@ -382,7 +432,7 @@ def edit_invoice_line_information():
     invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
     form = EditInvoiceLineInformation()
     if request.method == 'GET':
-        return render_template('edit_invoice_line_information.html', invoice_line=invoice_line, form=form)
+        return render_template('edit_invoice_line_information.html', invoice_line=invoice_line, form=form, user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -415,7 +465,7 @@ def delete_invoice_line():
                 return redirect(url_for('delete_invoice_line_confirmation', invoice_id=invoice_id, item_id=item_id))
         else:
             flash('Invoice line does not exist')
-    return render_template('delete_invoice_line.html', form=form)
+    return render_template('delete_invoice_line.html', form=form, user=current_user)
 
 
 @app.route('/delete_invoice_line_confirmation', methods=['GET', 'POST'])
@@ -432,7 +482,7 @@ def delete_invoice_line_confirmation():
             return redirect(url_for('home'))
         else:
             flash('Problem deleting the invoice')
-    return render_template('delete_invoice_line_confirmation.html', invoice_line=invoice_line, form=form)
+    return render_template('delete_invoice_line_confirmation.html', invoice_line=invoice_line, form=form, user=current_user)
 
 
 @app.route('/delete_invoice_line_confirmation_delete/<invoice_id>&<item_id>', methods=['POST'])
@@ -453,7 +503,7 @@ def delete_invoice_line_information_delete(invoice_id, item_id):
 def test():
     form = EditClientInformationForm()
     name = form.clientName.data
-    return render_template('test.html', name=name)
+    return render_template('test.html', name=name, user=current_user)
 
 
 if __name__ == '__main__':

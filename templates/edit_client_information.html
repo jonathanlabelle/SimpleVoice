@@ -1,60 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+                <div class="form-outline">
+                    <h1>Edit Client {{ client.client_id }}</h1>
+                    <h5>Only fill fields to edit</h5>
+                        <form method="POST" action="/edit_client_information_update/{{client.client_id}}">
+                            {{ form.csrf_token }}
+                            <fieldset class="clientName">
+                                <div class="form-group">
+                                    {{ form.clientName.label(class="form-label") }}
+                                    {{ form.clientName(class="form-control") }}
+                                </div>
 
-<h1>Edit Client {{ client.client_id }}</h1>
-<form method="POST" action="/edit_client_information_update/{{client.client_id}}">
-    {{ form.csrf_token }}
-    <fieldset class="clientName">
-        {{ form.clientName.label }}
-        {{ form.clientName(placeholder='Client name') }}
+                                {% if form.clientName.errors %}
+                                  <ul class="errors">
+                                    {% for error in form.clientName.errors %}
+                                      <li>{{ error }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                {% endif %}
+                            </fieldset>
+                            <fieldset class="clientEmail">
+                                <div class="form-group">
+                                    {{ form.clientEmail.label(class="form-label") }}
+                                    {{ form.clientEmail(class="form-control") }}
+                                </div>
+                                {% if form.clientEmail.errors %}
+                                  <ul class="errors">
+                                    {% for error in form.clientEmail.errors %}
+                                      <li>{{ error }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                {% endif %}
+                            </fieldset>
+                            <fieldset class="clientPhone">
+                                <div class="form-group">
+                                    {{ form.clientPhone.label(class="form-label") }}
+                                    {{ form.clientPhone(class="form-control") }}
+                                </div>
+                                {% if form.clientPhone.errors %}
+                                  <ul class="errors">
+                                    {% for error in form.clientPhone.errors %}
+                                      <li>{{ error }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                {% endif %}
+                            </fieldset>
+                            <fieldset class="clientReference">
+                                <div class="form-group">
+                                    {{ form.clientReference.label(class="form-label") }}
+                                    {{ form.clientReference(class="form-control") }}
+                                </div>
+                                {% if form.clientReference.errors %}
+                                  <ul class="errors">
+                                    {% for error in form.clientReference.errors %}
+                                      <li>{{ error }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                {% endif %}
+                            </fieldset>
 
-        {% if form.clientName.errors %}
-          <ul class="errors">
-            {% for error in form.clientName.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-    <fieldset class="clientEmail">
-        {{ form.clientEmail.label }}
-        {{ form.clientEmail(placeholder='Client email') }}
-
-        {% if form.clientEmail.errors %}
-          <ul class="errors">
-            {% for error in form.clientEmail.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-    <fieldset class="clientPhone">
-        {{ form.clientPhone.label }}
-        {{ form.clientPhone(placeholder='Client name') }}
-
-        {% if form.clientPhone.errors %}
-          <ul class="errors">
-            {% for error in form.clientPhone.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-    <fieldset class="clientReference">
-        {{ form.clientReference.label }}
-        {{ form.clientReference(placeholder='Client name') }}
-
-        {% if form.clientReference.errors %}
-          <ul class="errors">
-            {% for error in form.clientReference.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <div class="submit-button">
-        {{ form.submit }}
+                            <div class="form-group">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
     </div>
-</form>
+    <div class="right-panel right-panel-edit col-sm-4">
+        <h3>Current client {{ client.client_id }} informations</h3>
+        <p>Name : {{ client.name }}</p>
+        <p>Email : {{ client.email }}</p>
+        <p>Phone : {{ client.phone }}</p>
+        <p>Reference : {{ client.reference }}</p>
+    </div>
+</div>
+
+
 {% endblock %}

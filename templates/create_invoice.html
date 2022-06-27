@@ -1,23 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Create Invoice</h1>
-<form method="POST" action="/create_invoice">
-    {{ form.csrf_token }}
-    <fieldset class="client_id">
-        {{ form.client_id.label }}
-        {{ form.client_id(placeholder='Client id') }}
 
-        {% if form.client_id.errors %}
-          <ul class="errors">
-            {% for error in form.client_id.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-group col-lg-6">
+            <h1>Create Invoice</h1>
+            <div class="form-outline">
+                <form method="POST" action="/create_invoice">
+                    {{ form.csrf_token }}
+                    <fieldset class="client_id">
+                        <div class="form-group">
+                            {{ form.client_id.label(class="form-label") }}
+                            {{ form.client_id(class="form-control") }}
+                        </div>
+                        {% if form.client_id.errors %}
+                          <ul class="errors">
+                            {% for error in form.client_id.errors %}
+                              <li>{{ error }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                    </fieldset>
 
-    <div class="submit-button">
-        {{ form.submit }}
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
+        <div class="right-panel col-lg-6">
+
+        </div>
     </div>
-</form>
+</div>
 {% endblock %}

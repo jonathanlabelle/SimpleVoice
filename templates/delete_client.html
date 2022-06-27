@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+            <h1>Delete client</h1>
+                <div class="form-outline">
+                    <form method="POST" action="/delete_client">
+                        {{ form.csrf_token }}
+                        <fieldset class="client_id">
+                            <div class="form-group">
+                                {{ form.client_id.label(class="form-label") }}
+                                {{ form.client_id(class="form-control") }}
+                            </div>
+                            {% if form.client_id.errors %}
+                              <ul class="errors">
+                                {% for error in form.client_id.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
+        <div class="right-panel col-sm-4">
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
