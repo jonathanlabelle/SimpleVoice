@@ -48,13 +48,13 @@
             <li class="nav-heading">View</li>
                 <ul id="view-nav" class="nav-content" data-bs-parent="sidebar-nav">
                     <li>
-                        <a href="{{ url_for('create_invoice') }}">Invoices</a>
+                        <a href="{{ url_for('view_invoices_last_10') }}">Invoices</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('edit_invoice_get_id') }}">Clients</a>
+                        <a href="{{ url_for('view_clients_last_10') }}">Clients</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('delete_invoice') }}">Items</a>
+                        <a href="{{ url_for('view_items_last_10') }}">Items</a>
                     </li>
                 </ul>
             <li class="nav-heading">Manage</li>
@@ -63,6 +63,9 @@
                 <ul id="invoices-nav" class="nav-content" data-bs-parent="sidebar-nav">
                     <li>
                         <a href="{{ url_for('create_invoice') }}">Create</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('create_invoice_line') }}">Add lines</a>
                     </li>
                     <li>
                         <a href="{{ url_for('edit_invoice_get_id') }}">Update</a>

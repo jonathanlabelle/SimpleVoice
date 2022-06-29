@@ -1,6 +1,7 @@
 import sqlalchemy
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, EditClientInformationForm, \
@@ -10,8 +11,7 @@ from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, Edit
 from model import app, db, create_db, Users, Clients, Invoices, Items, InvoicesLines
 from utils import check_if_item_exist, get_item_info
 
-
-#TODO INSERTS SAME ITEMS INVOICE LINES
+# TODO INSERTS SAME ITEMS INVOICE LINES
 
 engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
 login_manager = LoginManager()
@@ -109,7 +109,8 @@ def delete_client_confirmation():
     if Invoices.query.filter_by(client_id=client_id).first():
         message = "Caution: Client still has invoices, they will be deleted if the client is deleted"
     form = ConfirmationForm()
-    return render_template('delete_client_confirmation.html', client=client, form=form, message=message, user=current_user)
+    return render_template('delete_client_confirmation.html', client=client, form=form, message=message,
+                           user=current_user)
 
 
 @app.route('/delete_client_confirmation_delete/<client_id>', methods=['POST'])
@@ -155,7 +156,8 @@ def edit_client_information():
     client = Clients.query.filter_by(client_id=client_id).first()
     form = EditClientInformationForm()
     if request.method == 'GET':
-        return render_template('edit_client_information.html', client=client, client_id=client_id, form=form, user=current_user)
+        return render_template('edit_client_information.html', client=client, client_id=client_id, form=form,
+                               user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -199,6 +201,7 @@ def create_invoice():
 @app.route('/edit_invoice', methods=['POST', 'GET'])
 @login_required
 def edit_invoice_get_id():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
     form = GetIDInvoiceForm()
     if form.validate_on_submit():
         invoice = Invoices.query.filter_by(invoice_id=form.invoice_id.data).first()
@@ -206,7 +209,7 @@ def edit_invoice_get_id():
             return redirect(url_for('edit_invoice_information', invoice_id=form.invoice_id.data))
         else:
             flash("Invoice {} doesn't exists".format(form.invoice_id.data))
-    return render_template('edit_invoice.html', form=form, user=current_user)
+    return render_template('edit_invoice.html', form=form, user=current_user, invoices=invoices)
 
 
 @app.route('/edit_invoice_information', methods=['POST', 'GET'])
@@ -236,6 +239,7 @@ def edit_invoice_information_update(invoice_id):
 @app.route('/delete_invoice', methods=['GET', 'POST'])
 @login_required
 def delete_invoice():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
     form = GetIDInvoiceForm()
     if form.validate_on_submit():
         invoice_id = form.invoice_id.data
@@ -245,7 +249,7 @@ def delete_invoice():
                 return redirect(url_for('delete_invoice_confirmation', invoice_id=invoice_id))
         else:
             flash('Invoice does not exist')
-    return render_template('delete_invoice.html', form=form, user=current_user)
+    return render_template('delete_invoice.html', form=form, user=current_user, invoices=invoices)
 
 
 @app.route('/delete_invoice_confirmation', methods=['GET', 'POST'])
@@ -257,7 +261,8 @@ def delete_invoice_confirmation():
     if InvoicesLines.query.filter_by(invoice_id=invoice_id).first():
         message = "Caution: Invoice is not empty, all lines will be deleted"
     form = ConfirmationForm()
-    return render_template('delete_invoice_confirmation.html', invoice=invoice, form=form, message=message, user=current_user)
+    return render_template('delete_invoice_confirmation.html', invoice=invoice, form=form, message=message,
+                           user=current_user)
 
 
 @app.route('/delete_invoice_confirmation_delete/<invoice_id>', methods=['POST'])
@@ -293,6 +298,7 @@ def create_item():
 @app.route('/edit_item', methods=['POST', 'GET'])
 @login_required
 def edit_item_get_id():
+    items = Items.query.filter_by(user=current_user.id).order_by('item_name').all()
     form = GetIDItemForm()
     if form.validate_on_submit():
         item = Items.query.filter_by(item_id=form.item_id.data).first()
@@ -300,7 +306,7 @@ def edit_item_get_id():
             return redirect(url_for('edit_item_information', item_id=item.item_id))
         else:
             flash("Item {} doesn't exists".format(form.item_id.data))
-    return render_template('edit_item.html', form=form, user=current_user)
+    return render_template('edit_item.html', form=form, user=current_user, items=items)
 
 
 @app.route('/edit_item_information', methods=['POST', 'GET'])
@@ -331,6 +337,7 @@ def edit_item_information_update(item_id):
 @app.route('/delete_item', methods=['GET', 'POST'])
 @login_required
 def delete_item():
+    items = Items.query.filter_by(user=current_user.id).order_by('item_name').all()
     form = GetIDItemForm()
     if form.validate_on_submit():
         item_id = form.item_id.data
@@ -340,7 +347,7 @@ def delete_item():
                 return redirect(url_for('delete_item_confirmation', item_id=item_id))
         else:
             flash('Item does not exist')
-    return render_template('delete_item.html', form=form, user=current_user)
+    return render_template('delete_item.html', form=form, user=current_user, items=items)
 
 
 @app.route('/delete_item_confirmation', methods=['GET', 'POST'])
@@ -432,7 +439,8 @@ def edit_invoice_line_information():
     invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
     form = EditInvoiceLineInformation()
     if request.method == 'GET':
-        return render_template('edit_invoice_line_information.html', invoice_line=invoice_line, form=form, user=current_user)
+        return render_template('edit_invoice_line_information.html', invoice_line=invoice_line, form=form,
+                               user=current_user)
     if form.validate_on_submit():
         return redirect(url_for('home'))
 
@@ -482,7 +490,8 @@ def delete_invoice_line_confirmation():
             return redirect(url_for('home'))
         else:
             flash('Problem deleting the invoice')
-    return render_template('delete_invoice_line_confirmation.html', invoice_line=invoice_line, form=form, user=current_user)
+    return render_template('delete_invoice_line_confirmation.html', invoice_line=invoice_line, form=form,
+                           user=current_user)
 
 
 @app.route('/delete_invoice_line_confirmation_delete/<invoice_id>&<item_id>', methods=['POST'])
@@ -498,6 +507,144 @@ def delete_invoice_line_information_delete(invoice_id, item_id):
     return redirect(url_for('home'))
 
 
+@app.route('/view_invoices_last_10', methods=['GET', 'POST'])
+@login_required
+def view_invoices_last_10():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id) \
+        .order_by(desc(Invoices.invoice_id)).limit(10).all()
+    return render_template('view_invoices_list.html', invoices=invoices, user=current_user)
+
+
+@app.route('/view_invoices_all_invoices', methods=['GET', 'POST'])
+@login_required
+def view_invoices_all_invoices():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
+    return render_template('view_invoices_list.html', invoices=invoices, user=current_user)
+
+
+# session.query(Clients)... check first if the client exist, then check if the client belongs to the user
+@app.route('/view_invoices_by_invoice_id', methods=['GET', 'POST'])
+@login_required
+def view_invoices_by_invoice_id():
+    form = GetIDInvoiceForm()
+    if form.validate_on_submit():
+        if session.query(Invoices).filter_by(invoice_id=form.invoice_id.data).first() and \
+                current_user.id == session.query(Invoices.user).filter_by(invoice_id=form.invoice_id.data).first()[0]:
+            return redirect(url_for('view_invoice', invoice_id=form.invoice_id.data))
+    return render_template('view_invoices_by_id.html', form=form, user=current_user.id)
+
+
+@app.route('/view_invoices_by_client_id', methods=['GET', 'POST'])
+@login_required
+def view_invoices_by_client_id():
+    form = GetIDClientForm()
+    if form.validate_on_submit():
+        invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(client_id=form.client_id.data,
+                                                                                 user=current_user.id).all()
+        return render_template('view_invoices_list.html', invoices=invoices, user=current_user)
+    return render_template('view_invoices_by_client_id.html', user=current_user.id, form=form)
+
+
+@app.route('/view_clients_last_10', methods=['GET', 'POST'])
+@login_required
+def view_clients_last_10():
+    clients = session.query(Clients).filter_by(user=current_user.id).order_by(desc(Clients.client_id)).limit(10).all()
+    return render_template('view_clients_list.html', clients=clients, user=current_user)
+
+
+@app.route('/view_clients_all_clients_id', methods=['GET', 'POST'])
+@login_required
+def view_clients_all_clients_id():
+    clients = session.query(Clients).filter_by(user=current_user.id).all()
+    return render_template('view_clients_list.html', clients=clients, user=current_user)
+
+
+@app.route('/view_clients_all_clients_name', methods=['GET', 'POST'])
+@login_required
+def view_clients_all_clients_name():
+    clients = session.query(Clients).filter_by(user=current_user.id).order_by(Clients.name).all()
+    return render_template('view_clients_list.html', clients=clients, user=current_user)
+
+
+"""
+session.query(Clients)... check first if the client exist, then check if the client belongs to the user
+"""
+
+
+@app.route('/view_clients_by_client_id', methods=['GET', 'POST'])
+@login_required
+def view_clients_by_client_id():
+    form = GetIDClientForm()
+    if form.validate_on_submit():
+        if session.query(Clients).filter_by(client_id=form.client_id.data).first() and \
+                current_user.id == session.query(Clients.user).filter_by(client_id=form.client_id.data).first()[0]:
+            return redirect(url_for('view_client', client_id=form.client_id.data))
+    return render_template('view_clients_by_id.html', form=form, user=current_user.id)
+
+
+@app.route('/view_items_last_10', methods=['GET', 'POST'])
+@login_required
+def view_items_last_10():
+    items = session.query(Items).filter_by(user=current_user.id).order_by(desc(Items.item_id)).limit(10).all()
+    return render_template('view_items_list.html', items=items, user=current_user)
+
+
+@app.route('/view_items_all_by_item_id', methods=['GET', 'POST'])
+@login_required
+def view_items_all_items_by_id():
+    items = session.query(Items).filter_by(user=current_user.id).all()
+    return render_template('view_items_list.html', items=items, user=current_user)
+
+
+@app.route('/view_items_all_by_item_name', methods=['GET', 'POST'])
+@login_required
+def view_items_all_items_by_name():
+    items = session.query(Items).filter_by(user=current_user.id).order_by(Items.item_name).all()
+    return render_template('view_items_list.html', items=items, user=current_user)
+
+
+"""
+session.query(Clients)... check first if the client exist, then check if the client belongs to the user
+"""
+
+
+@app.route('/view_items_by_item_id', methods=['GET', 'POST'])
+@login_required
+def view_items_by_item_id():
+    form = GetIDItemForm()
+    if form.validate_on_submit():
+        if session.query(Items).filter_by(item_id=form.item_id.data).first() and \
+                current_user.id == session.query(Items.user).filter_by(item_id=form.item_id.data).first()[0]:
+            return redirect(url_for('view_item', item_id=form.item_id.data))
+    return render_template('view_items_by_id.html', form=form, user=current_user.id)
+
+
+@app.route('/view_invoice/<int:invoice_id>', methods=['GET', 'POST'])
+@login_required
+def view_invoice(invoice_id):
+    invoice = Invoices.query.filter_by(invoice_id=invoice_id).first()
+    client = Clients.query.filter_by(client_id=invoice.client_id).first()
+    invoice_lines = InvoicesLines.query.filter_by(invoice_id=invoice_id).all()
+    return render_template('view_invoice.html', invoice=invoice, client=client, invoice_lines=invoice_lines,
+                           user=current_user.id)
+
+
+@app.route('/view_client/<int:client_id>', methods=['GET', 'POST'])
+@login_required
+def view_client(client_id):
+    client = Clients.query.filter_by(client_id=client_id).first()
+    invoices = Invoices.query.filter_by(client_id=client_id).all()
+    return render_template('view_client.html', invoices=invoices, client=client, user=current_user.id)
+
+
+@app.route('/view_item/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def view_item(item_id):
+    item = Items.query.filter_by(item_id=item_id).first()
+    invoice_lines = InvoicesLines.query.filter_by(item_id=item_id).all()
+    return render_template('view_item.html', invoice_lines=invoice_lines, item=item, user=current_user.id)
+
+
 @app.route('/test', methods=['POST'])
 @login_required
 def test():
@@ -507,5 +654,7 @@ def test():
 
 
 if __name__ == '__main__':
-    create_db()
-
+    # create_db()
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=1).all()
+    # session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
+    print(invoices)

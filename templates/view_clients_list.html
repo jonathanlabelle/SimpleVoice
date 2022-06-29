@@ -1,0 +1,27 @@
+{% extends 'view_clients.html' %}
+{% block request_view %}
+    <div class="overflow-auto">
+        <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Client Id</th>
+                    <th>Client Name</th>
+                    <th>Reference</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td><a href="{{ url_for('view_client', client_id=client.client_id) }}">{{client.client_id}}</a></td>
+                    <td>{{client.name}}</td>
+                    <td>{{client.reference}}</td>
+                    <td>{{client.phone}}</td>
+                    <td>{{client.email}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

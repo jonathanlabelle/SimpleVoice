@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="view">
+    <div class="page-content">
+        <div class="button-bar">
+            <ul>
+                <li><a href="{{ url_for('view_clients_last_10') }}">Last 10 clients</a></li>
+                <li><a href="{{ url_for('view_clients_all_clients_name') }}">All clients by name</a></li>
+                <li><a href="{{ url_for('view_clients_all_clients_id') }}">All clients by ID</a></li>
+                <li><a href="{{ url_for('view_clients_by_client_id') }}">By client number</a></li>
+            </ul>
+        </div>
+        <div class="request-view">
+            {% block request_view %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

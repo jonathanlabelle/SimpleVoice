@@ -1,0 +1,23 @@
+{% extends 'view_items.html' %}
+{% block request_view %}
+ <div class="overflow-auto">
+    <table class="table">
+        <thead class="table-dark">
+            <tr>
+                <th>Item Id</th>
+                <th>Item Name</th>
+                <th>Item price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><a href="{{ url_for('view_item', item_id=item.item_id) }}">{{item.item_id}}</a></td>
+                <td>{{item.item_name}}</td>
+                <td>{{item.item_price}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

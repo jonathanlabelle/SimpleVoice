@@ -1,5 +1,23 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block content %}0
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+                <h1>Edit invoice line. Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
+                <div class="form-outline">
+
+
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
+    </div>
+    <div class="right-panel right-panel-edit col-sm-4">
+        <h3>Current client {{ client.client_id }} informations</h3>
+        <p>Name : {{ client.name }}</p>
+        <p>Email : {{ client.email }}</p>
+        <p>Phone : {{ client.phone }}</p>
+        <p>Reference : {{ client.reference }}</p>
+    </div>
+</div>
 <h1>Edit invoice line. Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
 <form method="POST" action="/edit_invoice_line_information_update/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
     {{ form.csrf_token }}

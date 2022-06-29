@@ -1,24 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h1>Edit invoice {{ invoice.invoice_id }}</h1>
-<form method="POST" action="/edit_invoice_information_update/{{invoice.invoice_id}}>">
-    {{ form.csrf_token }}
-    <fieldset class="client_id">
-        {{ form.client_id.label }}
-        {{ form.client_id(placeholder=current_client) }}
-
-        {% if form.client_id.errors %}
-          <ul class="errors">
-            {% for error in form.client_id.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <div class="submit-button">
-        {{ form.submit }}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+            <h1>Edit invoice {{ invoice.invoice_id }}</h1>
+                <div class="form-outline">
+                    <form method="POST" action="/edit_invoice_information_update/{{invoice.invoice_id}}>">
+                        {{ form.csrf_token }}
+                        <fieldset class="client_id">
+                            <div class="form-group">
+                                {{ form.client_id.label(class="form-label") }}
+                                {{ form.client_id(class="form-control") }}
+                            </div>
+                            {% if form.client_id.errors %}
+                              <ul class="errors">
+                                {% for error in form.client_id.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
     </div>
-</form>
+    <div class="right-panel right-panel-edit col-sm-4">
+        <h3>Current invoice informations</h3>
+        <p>Client ID : {{ invoice.client_id }}</p>
+        <p>Total: {{ invoice.total }}</p>
+    </div>
+</div>
+
 {% endblock %}

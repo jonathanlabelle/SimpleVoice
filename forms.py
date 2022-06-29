@@ -48,7 +48,7 @@ class CreateInvoiceForm(FlaskForm):
 
 class GetIDInvoiceForm(FlaskForm):
     invoice_id = IntegerField('Invoice ID', validators=[Optional()])
-    submit = SubmitField('Edit invoice')
+    submit = SubmitField('Submit')
 
 
 class EditInvoiceInformationForm(FlaskForm):
@@ -64,7 +64,7 @@ class CreateItemForm(FlaskForm):
 
 class GetIDItemForm(FlaskForm):
     item_id = IntegerField('Item ID', validators=[Optional()])
-    submit = SubmitField('Edit item')
+    submit = SubmitField('Submit')
 
 
 class EditItemInformationForm(FlaskForm):

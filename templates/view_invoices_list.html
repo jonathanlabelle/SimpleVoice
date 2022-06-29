@@ -1,0 +1,24 @@
+{% extends 'view_invoices.html' %}
+{% block request_view %}
+    <table class="table">
+        <thead class="table-dark">
+            <tr>
+                <th>Invoice Id</th>
+                <th>Client Id</th>
+                <th>Client Name</th>
+                <th>Invoice Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td><a href="{{ url_for('view_invoice', invoice_id=invoice[0].invoice_id) }}">{{invoice[0].invoice_id}}</a></td>
+                <td><a href="{{ url_for('view_client', client_id=invoice[0].client_id) }}">{{invoice[0].client_id}}</a></td>
+                <td>{{invoice.name}}</td>
+                <td>{{invoice[0].total}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

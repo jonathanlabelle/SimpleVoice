@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="view">
+    <div class="page-content">
+        <div class="button-bar">
+            <ul>
+                <li><a href="{{ url_for('view_items_last_10') }}">Last 10 items</a></li>
+                <li><a href="{{ url_for('view_items_all_items_by_name') }}">All items by name</a></li>
+                <li><a href="{{ url_for('view_items_all_items_by_id') }}">All items by ID</a></li>
+                <li><a href="{{ url_for('view_items_by_item_id') }}">By item number</a></li>
+            </ul>
+        </div>
+        <div class="request-view">
+            {% block request_view %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

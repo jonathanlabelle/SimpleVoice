@@ -1,23 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Edit Invoice</h1>
-<form method="POST" action="/edit_invoice">
-    {{ form.csrf_token }}
-    <fieldset class="invoice_id">
-        {{ form.invoice_id.label }}
-        {{ form.invoice_id(placeholder='Number of the invoice to edit') }}
-
-        {% if form.invoice_id.errors %}
-          <ul class="errors">
-            {% for error in form.invoice_id.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <div class="submit-button">
-        {{ form.submit }}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+            <h1>Edit Invoice</h1>
+                <div class="form-outline">
+                    <form method="POST" action="/edit_invoice">
+                        {{ form.csrf_token }}
+                        <fieldset class="invoice_id">
+                            <div class="form-group">
+                                {{ form.invoice_id.label(class="form-label") }}
+                                {{ form.invoice_id(class="form-control") }}
+                            </div>
+                            {% if form.invoice_id.errors %}
+                              <ul class="errors">
+                                {% for error in form.invoice_id.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
     </div>
-</form>
+    <div class="right-panel right-panel-table col-sm-4">
+        <div class="table-view">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Client ID</th>
+                        <th>Client name</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td>{{invoice[0].invoice_id}}</td>
+                        <td>{{invoice[0].client_id}}</td>
+                        <td>{{invoice.name}}</td>
+                        <td>{{invoice[0].total}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
-<h1>Do you wish to delete : Name: {{item.item_name}} - Price: {{item.item_price}}</h1>
-<form method="POST" action="/delete_item_confirmation_delete/{{item.item_id}}">
-    {{ form.csrf_token }}
-
-    <div class="submit-button">
-        {{ form.submit }}
-    </div>
-    <div class="not-submit">
-        <a href="{{url_for('home')}}"><button>Don't delete</button></a>
-    </div>
-</form>
+<div class="col-lg-6">
+    <div class="allo">
+        <h1>Do you wish to delete : Name: {{item.item_name}} - Price: {{item.item_price}}</h1>
+            <div class="form-outline">
+                <form method="POST" action="/delete_item_confirmation_delete/{{item.item_id}}">
+                    {{ form.csrf_token }}
+                    <div class=" form-group confirmation-row">
+                        {{ form.submit(class="btn btn-danger") }}
+                        <a href="{{url_for('home')}}"><button class="btn btn-primary">Don't delete</button></a>
+                    </div>
+                </form>
+            </div> <!-- div form-outlne -->
+    </div> <!-- div form-group -->
+</div>
 {% endblock %}

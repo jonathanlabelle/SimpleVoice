@@ -1,0 +1,35 @@
+{% extends 'view_invoices.html' %}
+{% block title%} Search invoice {% endblock%}
+{% block request_view %}
+    <div class="overflow-hidden">
+        <div class="views_form">
+            <div class="form-content">
+                <div class="form-header">
+                    <h4>Search invoice by client id</h4>
+                    <p>Enter the ID of the client</p>
+                </div>
+                <div class="form-inputs">
+                     <form method="POST" action="/view_invoices_by_client_id">
+                        {{ form.csrf_token }}
+                            <fieldset class="client_id">
+                                <div class="form-group">
+                                    {{ form.client_id.label(class="form-label") }}
+                                    {{ form.client_id(class="form-control") }}
+                                </div>
+                                {% if form.client_id.errors %}
+                                  <ul class="errors">
+                                    {% for error in form.client_id.errors %}
+                                      <li>{{ error }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                {% endif %}
+                            </fieldset>
+                         <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

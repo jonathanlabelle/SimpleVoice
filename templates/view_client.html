@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+      <div class="view">
+          <div class="view-item overflow-hidden" id="view-client-item-left">
+          <table class="table">
+                <tbody>
+                <tr>
+                      <th>Client Name:</th>
+                      <th>{{client.name}}</th>
+                    </tr>
+                    <tr>
+                      <th>Client ID:</th>
+                      <th>{{client.client_id}}</th>
+                    </tr>
+                    <tr>
+                      <th>Reference person:</th>
+                      <th>{{client.reference}}</th>
+                    </tr>
+                    <tr>
+                      <th>Client phone:</th>
+                      <th>{{client.phone}}</th>
+                    </tr>
+                    <tr>
+                      <th>Client email:</th>
+                      <th>{{client.email}}</th>
+                    </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="view-item" id="view-client-item-right">
+              <table class="table">
+                  <thead class="table-dark">
+                    <tr>
+                        <th class="th-client-item">Invoices associated to this client</th>
+                        <th class="th-client-item"></th>
+                    </tr>
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Invoice Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for invoice in invoices %}
+                      <tr>
+                          <td><a href="{{url_for('view_invoice', invoice_id=invoice.invoice_id)}}">{{invoice.invoice_id}}</a></td>
+                          <td>{{invoice.total}}</td>
+                      </tr>
+                  {% endfor %}
+                  </tbody>
+            </table>
+          </div>
+      </div>
+{% endblock %}
