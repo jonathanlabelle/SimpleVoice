@@ -6,12 +6,6 @@ from sqlalchemy import Integer, Column, VARCHAR, ForeignKey, Numeric, PrimaryKey
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
-Bootstrap(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/SimpleVoice'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
 db = SQLAlchemy(app)
 
 

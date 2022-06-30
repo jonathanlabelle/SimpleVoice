@@ -1,5 +1,6 @@
 import sqlalchemy
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -8,11 +9,15 @@ from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, Edit
     CreateInvoiceForm, GetIDInvoiceForm, EditInvoiceInformationForm, CreateItemForm, GetIDItemForm, \
     EditItemInformationForm, CreateInvoiceLines, GetInvoiceLineIDForm, EditInvoiceLineInformation, ConfirmationForm
 
-from model import app, db, create_db, Users, Clients, Invoices, Items, InvoicesLines
+from model import db, create_db, Users, Clients, Invoices, Items, InvoicesLines
 from utils import check_if_item_exist, get_item_info
 
 # TODO INSERTS SAME ITEMS INVOICE LINES
-
+app = Flask(__name__)
+app.config['SECRET_KEY'] = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
+Bootstrap(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/SimpleVoice'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
 login_manager = LoginManager()
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -670,3 +675,4 @@ def test():
 
 if __name__ == '__main__':
     create_db()
+    app.run()
