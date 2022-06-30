@@ -1,36 +1,74 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Delete invoice line</h1>
-<form method="POST" action="/delete_invoice_line">
-    {{ form.csrf_token }}
-    <fieldset class="invoice_id">
-        {{ form.invoice_id.label }}
-        {{ form.invoice_id(placeholder='Invoice ID') }}
-
-        {% if form.invoice_id.errors %}
-          <ul class="errors">
-            {% for error in form.invoice_id.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <fieldset class="item_id">
-        {{ form.item_id.label }}
-        {{ form.item_id(placeholder='Item ID') }}
-
-        {% if form.item_id.errors %}
-          <ul class="errors">
-            {% for error in form.item_id.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <div class="submit-button">
-        {{ form.submit }}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
+            <h1>Delete invoice line</h1>
+                <div class="form-outline">
+                    <form method="POST" action="delete_invoice_line">
+                        {{ form.csrf_token }}
+                        <fieldset class="invoice_id">
+                            <div class="form-group">
+                                {{ form.invoice_id.label(class="form-label") }}
+                                {{ form.invoice_id(class="form-control") }}
+                            </div>
+                            {% if form.invoice_id.errors %}
+                              <ul class="errors">
+                                {% for error in form.invoice_id.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset class="item_id">
+                            <div class="form-group">
+                                {{ form.item_id.label(class="form-label") }}
+                                {{ form.item_id(class="form-control") }}
+                            </div>
+                            {% if form.item_id.errors %}
+                              <ul class="errors">
+                                {% for error in form.item_id.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <div class="submit-button">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div> <!-- div form-outlne -->
+        </div> <!-- div form-group -->
+        </div>
+            <div class="right-panel right-panel-table col-sm-8">
+                <div class="table-view-quick-access-invoices">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><h5>Last 20 invoices</h5></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Client ID</th>
+                            <th>Client name</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>{{invoice[0].invoice_id}}</td>
+                            <td>{{invoice[0].client_id}}</td>
+                            <td>{{invoice.name}}</td>
+                            <td>{{invoice[0].total}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
     </div>
-</form>
+</div>
 {% endblock %}

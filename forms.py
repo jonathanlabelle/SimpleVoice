@@ -87,7 +87,7 @@ class CreateInvoiceLines(FlaskForm):
 class GetInvoiceLineIDForm(FlaskForm):
     invoice_id = IntegerField('Invoice ID', validators=[DataRequired()])
     item_id = IntegerField('Item ID', validators=[DataRequired()])
-    submit = SubmitField('Edit item')
+    submit = SubmitField('Confirm')
 
 
 class EditInvoiceLineInformation(FlaskForm):

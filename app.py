@@ -80,8 +80,8 @@ def create_client():
                          user=current_user.id)
         session.add(client)
         session.commit()
-        return redirect(url_for('home'))
-
+        flash("New client created with ID number {}".format(client.client_id))
+        return redirect(url_for('create_client'))
     return render_template('create_client.html', form=form, user=current_user)
 
 
@@ -142,8 +142,9 @@ def edit_client_get_id():
     form = GetIDClientForm()
     if form.validate_on_submit():
         client = Clients.query.filter_by(client_id=form.client_id.data).first()
-        if client.user == current_user.id:
-            return redirect(url_for('edit_client_information', client_id=form.client_id.data))
+        if client:
+            if client.user == current_user.id:
+                return redirect(url_for('edit_client_information', client_id=form.client_id.data))
         else:
             flash("Client {} doesn't exists".format(form.client_id.data))
     return render_template('edit_client.html', form=form, user=current_user)
@@ -176,6 +177,7 @@ def edit_client_information_update(client_id):
     if form.clientReference.data:
         client.reference = form.clientReference.data
     db.session.commit()
+    flash("Client {} updated".format(client.client_id))
     return redirect(url_for('home'))
 
 
@@ -186,14 +188,17 @@ def create_invoice():
     if form.validate_on_submit():
         client_id = form.client_id.data
         client_data = Clients.query.filter_by(client_id=client_id).first()
-        if client_data.user == current_user.id:
-            invoice = Invoices(client_id=client_id, total=0, user=current_user.id)
-            session.add(invoice)
-            session.commit()
-            print(invoice.invoice_id)
-            flash('Added invoice number {} for {}(id: {})'.format(invoice.invoice_id, client_data.name,
-                                                                  client_data.client_id))
-        session.commit()
+        if client_data:
+            if client_data.user == current_user.id:
+                invoice = Invoices(client_id=client_id, total=0, user=current_user.id)
+                session.add(invoice)
+                session.commit()
+                print(invoice.invoice_id)
+                flash('Added invoice number {} for {}(id: {})'.format(invoice.invoice_id, client_data.name,
+                                                                      client_data.client_id))
+                session.commit()
+        else:
+            flash('No client matching that id')
         return redirect(url_for('create_invoice'))
     return render_template('create_invoice.html', form=form, user=current_user)
 
@@ -291,6 +296,7 @@ def create_item():
         item = Items(item_name=form.item_name.data, item_price=form.item_price.data, user=current_user.id)
         session.add(item)
         session.commit()
+        flash("{} created with ID {}".format(item.item_name, item.item_id))
         return redirect(url_for('home'))
     return render_template('create_item.html', form=form, user=current_user)
 
@@ -302,7 +308,7 @@ def edit_item_get_id():
     form = GetIDItemForm()
     if form.validate_on_submit():
         item = Items.query.filter_by(item_id=form.item_id.data).first()
-        if item.user == current_user.id:
+        if item and item.user == current_user.id:
             return redirect(url_for('edit_item_information', item_id=item.item_id))
         else:
             flash("Item {} doesn't exists".format(form.item_id.data))
@@ -331,6 +337,7 @@ def edit_item_information_update(item_id):
     if form.item_price.data:
         item.item_price = form.item_price.data
     db.session.commit()
+    flash("Item edited")
     return redirect(url_for('home'))
 
 
@@ -375,60 +382,66 @@ def delete_item_confirmation_delete(item_id):
 @app.route('/create_invoice_line', methods=['POST', 'GET'])
 @login_required
 def create_invoice_line():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id)\
+        .order_by(desc(Invoices.invoice_id)).limit(20).all()
     form = CreateInvoiceLines()
     if form.validate_on_submit():
         invoice = Invoices.query.filter_by(invoice_id=form.invoice_id.data).first()
-        if invoice.user == current_user.id:
-            if check_if_item_exist(form.item_id_1.data, current_user.id) and form.quantity_1.data > 0:
-                item_info = get_item_info(form.item_id_1.data)
-                invoice_line_1 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_1.data,
-                                               item_name=item_info[0], price=item_info[1],
-                                               quantity=form.quantity_1.data, user=current_user.id)
-                session.add(invoice_line_1)
-                session.commit()
-                flash('First line successfully added')
-            else:
-                flash('Problem adding first line')
-            if form.item_id_2.data:
-                if check_if_item_exist(form.item_id_2.data, current_user.id) and form.quantity_2.data > 0:
-                    item_info = get_item_info(form.item_id_2.data)
-                    invoice_line_2 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_2.data,
+        if invoice:
+            if invoice.user == current_user.id:
+                if check_if_item_exist(form.item_id_1.data, current_user.id) and form.quantity_1.data > 0:
+                    item_info = get_item_info(form.item_id_1.data)
+                    invoice_line_1 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_1.data,
                                                    item_name=item_info[0], price=item_info[1],
-                                                   quantity=form.quantity_2.data, user=current_user.id)
-                    session.add(invoice_line_2)
+                                                   quantity=form.quantity_1.data, user=current_user.id)
+                    session.add(invoice_line_1)
                     session.commit()
-                    flash('Second line successfully added')
+                    flash('First line successfully added')
                 else:
-                    flash('Problem adding second line')
-            if form.item_id_3.data:
-                if check_if_item_exist(form.item_id_3.data, current_user.id) and form.quantity_3.data > 0:
-                    item_info = get_item_info(form.item_id_3.data)
-                    invoice_line_3 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_3.data,
-                                                   item_name=item_info[0], price=item_info[1],
-                                                   quantity=form.quantity_3.data, user=current_user.id)
-                    session.add(invoice_line_3)
-                    session.commit()
-                    flash('Third line successfully added')
-                else:
-                    flash('Problem adding third line')
-            return redirect(url_for('create_invoice_line'))
+                    flash('Problem adding first line')
+                if form.item_id_2.data:
+                    if check_if_item_exist(form.item_id_2.data, current_user.id) and form.quantity_2.data > 0:
+                        item_info = get_item_info(form.item_id_2.data)
+                        invoice_line_2 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_2.data,
+                                                       item_name=item_info[0], price=item_info[1],
+                                                       quantity=form.quantity_2.data, user=current_user.id)
+                        session.add(invoice_line_2)
+                        session.commit()
+                        flash('Second line successfully added')
+                    else:
+                        flash('Problem adding second line')
+                if form.item_id_3.data:
+                    if check_if_item_exist(form.item_id_3.data, current_user.id) and form.quantity_3.data > 0:
+                        item_info = get_item_info(form.item_id_3.data)
+                        invoice_line_3 = InvoicesLines(invoice_id=form.invoice_id.data, item_id=form.item_id_3.data,
+                                                       item_name=item_info[0], price=item_info[1],
+                                                       quantity=form.quantity_3.data, user=current_user.id)
+                        session.add(invoice_line_3)
+                        session.commit()
+                        flash('Third line successfully added')
+                    else:
+                        flash('Problem adding third line')
+                return redirect(url_for('create_invoice_line'))
         else:
             flash("Invoice doesn't exist")
-    return render_template('create_invoice_line.html', form=form, user=current_user)
+    return render_template('create_invoice_line.html', invoices=invoices, form=form, user=current_user)
 
 
 @app.route('/edit_invoice_line', methods=['POST', 'GET'])
 @login_required
 def edit_invoice_line_get_id():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id)\
+        .order_by(desc(Invoices.invoice_id)).limit(20).all()
     form = GetInvoiceLineIDForm()
     if form.validate_on_submit():
         invoice_line = InvoicesLines.query.filter_by(item_id=form.item_id.data, invoice_id=form.invoice_id.data).first()
-        if invoice_line.user == current_user.id:
-            return redirect(url_for('edit_invoice_line_information', item_id=form.item_id.data,
-                                    invoice_id=form.invoice_id.data))
+        if invoice_line:
+            if invoice_line.user == current_user.id:
+                return redirect(url_for('edit_invoice_line_information', item_id=form.item_id.data,
+                                        invoice_id=form.invoice_id.data))
         else:
             flash("Invoice line doesn't exists".format(form.item_id.data))
-    return render_template('edit_invoice_line.html', form=form, user=current_user)
+    return render_template('edit_invoice_line.html', invoices=invoices, form=form, user=current_user)
 
 
 @app.route('/edit_invoice_line_information', methods=['POST', 'GET'])
@@ -457,12 +470,14 @@ def edit_invoice_line_information_update(invoice_id, item_id):
     if form.item_price.data:
         invoice_line.price = form.item_price.data
     db.session.commit()
+    flash("Invoice line updated")
     return redirect(url_for('home'))
 
 
 @app.route('/delete_invoice_line', methods=['GET', 'POST'])
 @login_required
 def delete_invoice_line():
+    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
     form = GetInvoiceLineIDForm()
     if form.validate_on_submit():
         invoice_id = form.invoice_id.data
@@ -473,7 +488,7 @@ def delete_invoice_line():
                 return redirect(url_for('delete_invoice_line_confirmation', invoice_id=invoice_id, item_id=item_id))
         else:
             flash('Invoice line does not exist')
-    return render_template('delete_invoice_line.html', form=form, user=current_user)
+    return render_template('delete_invoice_line.html', invoices=invoices, form=form, user=current_user)
 
 
 @app.route('/delete_invoice_line_confirmation', methods=['GET', 'POST'])
@@ -654,7 +669,4 @@ def test():
 
 
 if __name__ == '__main__':
-    # create_db()
-    invoices = session.query(Invoices, Clients.name).join(Clients).filter_by(user=1).all()
-    # session.query(Invoices, Clients.name).join(Clients).filter_by(user=current_user.id).all()
-    print(invoices)
+    create_db()

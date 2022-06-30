@@ -1,68 +1,63 @@
 {% extends 'base.html' %}
-{% block content %}0
+{% block content %}
 <div class="row">
     <div class="col-sm-4">
         <div class="form-group col-sm-10">
-                <h1>Edit invoice line. Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
+                <h1>Edit invoice line</h1>
                 <div class="form-outline">
-
-
+                    <form method="POST" action="/edit_invoice_line_information_update/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
+                        <fieldset class="item_name">
+                            <div class="form-group">
+                                {{ form.item_name.label(class="form-label") }}
+                                {{ form.item_name(class="form-control") }}
+                            </div>
+                            {% if form.item_name.errors %}
+                              <ul class="errors">
+                                {% for error in form.item_name.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset class="item_price">
+                            <div class="form-group">
+                                {{ form.item_price.label(class="form-label") }}
+                                {{ form.item_price(class="form-control") }}
+                            </div>
+                            {% if form.item_price.errors %}
+                              <ul class="errors">
+                                {% for error in form.item_price.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset class="quantity">
+                            <div class="form-group">
+                                {{ form.quantity.label(class="form-label") }}
+                                {{ form.quantity(class="form-control") }}
+                            </div>
+                            {% if form.quantity.errors %}
+                              <ul class="errors">
+                                {% for error in form.quantity.errors %}
+                                  <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
                 </div> <!-- div form-outlne -->
         </div> <!-- div form-group -->
     </div>
     <div class="right-panel right-panel-edit col-sm-4">
-        <h3>Current client {{ client.client_id }} informations</h3>
-        <p>Name : {{ client.name }}</p>
-        <p>Email : {{ client.email }}</p>
-        <p>Phone : {{ client.phone }}</p>
-        <p>Reference : {{ client.reference }}</p>
+        <h3>Current invoice line informations</h3>
+        <p>Item ID : {{ invoice_line.item_id }}</p>
+        <p>Name : {{ invoice_line.item_name }}</p>
+        <p>Price : {{ invoice_line.price }}</p>
+        <p>Quantity : {{ invoice_line.quantity }}</p>
     </div>
 </div>
-<h1>Edit invoice line. Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
-<form method="POST" action="/edit_invoice_line_information_update/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
-    {{ form.csrf_token }}
-    <fieldset class="item_name">
-        {{ form.item_name.label }}
-        {{ form.item_name(placeholder='Item name') }}
-
-        {% if form.item_name.errors %}
-          <ul class="errors">
-            {% for error in form.item_name.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <fieldset class="item_price">
-        {{ form.item_price.label }}
-        {{ form.item_price(placeholder='Item price') }}
-
-        {% if form.item_price.errors %}
-          <ul class="errors">
-            {% for error in form.item_price.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-    <fieldset class="quantity">
-        {{ form.quantity.label }}
-        {{ form.quantity(placeholder='Quantity') }}
-
-        {% if form.quantity.errors %}
-          <ul class="errors">
-            {% for error in form.quantity.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    </fieldset>
-
-
-    <div class="submit-button">
-        {{ form.submit }}
-    </div>
-</form>
 {% endblock %}

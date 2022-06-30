@@ -3,8 +3,9 @@
 {% block content %}
 
       <div class="view">
-          <div class="view-item overflow-hidden" id="view-client-item-left">
-          <table class="table">
+          <div class="view-client-item-left">
+              <h4 class="th-client-item">Invoices associated to this client</h4>
+              <table class="table">
                 <tbody>
                 <tr>
                       <th>Client Name:</th>
@@ -29,13 +30,9 @@
               </tbody>
             </table>
           </div>
-          <div class="view-item" id="view-client-item-right">
+          <div class="view-item table-view-quick-access">
+              <h4 class="th-client-item">Invoices associated to this client</h4>
               <table class="table">
-                  <thead class="table-dark">
-                    <tr>
-                        <th class="th-client-item">Invoices associated to this client</th>
-                        <th class="th-client-item"></th>
-                    </tr>
                     <tr>
                       <th>Invoice ID</th>
                       <th>Invoice Total</th>

@@ -1,20 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-
 <div class="col-lg-6">
-    <div class="allo">
-        <h2>Do you wish to delete client: ID : {{client.client_id}} - Name : {{client.name}}</h2>
-        <h4>{{message}}</h4>
-            <div class="form-outline">
-                <form method="POST" action="/delete_client_confirmation_delete/{{client.client_id}}">
-                    {{ form.csrf_token }}
-                        <div class=" form-group confirmation-row">
-                                {{ form.submit(class="btn btn-danger") }}
-                                <a href="{{url_for('home')}}"><button class="btn btn-primary" >Don't delete</button></a>
-                        </div>
-
-                </form>
-            </div> <!-- div form-outlne -->
-    </div> <!-- div form-group -->
+    <h2>Do you wish to delete client: ID : {{client.client_id}} - Name : {{client.name}}</h2>
+    <h4>{{message}}</h4>
+    <div class="form-outline">
+        <div class="confirmation-row">
+            <form method="POST" action="/delete_client_confirmation_delete/{{client.client_id}}">
+                {{ form.csrf_token }}
+                {{ form.submit(class="btn btn-danger") }}
+            </form>
+            <a href="{{url_for('home')}}"><button class="btn btn-primary" >Don't delete</button></a>
+        </div>
+    </div> <!-- div form-outlne -->
 </div>
 {% endblock %}

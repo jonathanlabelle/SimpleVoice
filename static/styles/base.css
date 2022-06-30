@@ -35,6 +35,20 @@ a:hover {
   box-shadow: 0 2px 4px 0 rgba(168, 218, 220, 0.4);
 }
 
+.flashes {
+    list-style-type: none;
+    padding: 0px;
+}
+
+.flashes li {
+    background-color: #A8DADC;
+    color: #252422;
+}
+
+.form-outline {
+    min-width: 200px;
+}
+
 
 /*--------------------------------------------------------------
 # Header
@@ -236,6 +250,9 @@ a:hover {
     border-color: #E63946;
 }
 
+.right-panel {
+    float: right;
+}
 .right-panel h3 {
     padding-bottom: 50px;
 }
@@ -252,14 +269,14 @@ a:hover {
 
 .table-view {
     max-height: 60%;
-    overflow: auto;
+    overflow: hidden;
     width: 100%;
 }
 
 .right-panel-table table {
 }
 
-.confirmation-row {
+.confirmation-row form {
     display: inline;
 }
 
@@ -344,7 +361,7 @@ a:hover {
 
 .view-invoice {
     height: 100%;
-    -y: auto;
+    overflow-y: auto;
 }
 
 .view-client-item {
@@ -353,16 +370,37 @@ a:hover {
     width: 50%;
 }
 
-#view-client-item-left {
-    width: 40%
+.view-client-item-left {
+    width: 40%;
     float: left;
-    padding-right:20px;
+    padding-right: 20px;
+}
+
+.table-view-quick-access {
+    max-height: 80%;
+    overflow: auto;
+    width: 40%;
+}
+
+.table-view-quick-access-invoices {
+    max-height: 80%;
+    overflow: auto;
+    width: 60%;
 }
 
 .th-client-item {
     background-color: #F1FAEE;
     color: #252422;
+    width: 100%;
     border-top: 1px solid #dee2e6 !important;
+}
+
+.table-dark {
+    background-color: #F1FAEE;
+}
+
+.table-dark th {
+    color: #1D3557;
 }
 
 .views_form {

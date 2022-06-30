@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Do you wish to delete . Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h1>
-<form method="POST" action="/delete_invoice_line_confirmation_delete/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
-    {{ form.csrf_token }}
 
-    <div class="submit-button">
-        {{ form.submit }}
-    </div>
-    <div class="not-submit">
-        <a href="{{url_for('home')}}"><button>Don't delete</button></a>
-    </div>
-</form>
+<div class="col-lg-6">
+    <h2>Do you wish to delete . Name: {{invoice_line.item_name}} Quantity: {{invoice_line.quantity}} Price: {{invoice_line.price}}</h2>
+    <div class="form-outline">
+         <div class="confirmation-row">
+            <div class="form-group confirmation-row">
+                <form method="POST" action="/delete_invoice_line_confirmation_delete/{{invoice_line.invoice_id}}&{{invoice_line.item_id}}">
+                    {{ form.csrf_token }}
+                    {{ form.submit(class="btn btn-danger") }}
+                </form>
+                <a href="{{url_for('home')}}"><button class="btn btn-primary" >Don't delete</button></a>
+            </div>
+         </div>
+    </div> <!-- div form-outlne -->
+</div>
 {% endblock %}
