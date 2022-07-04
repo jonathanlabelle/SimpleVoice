@@ -9,10 +9,10 @@ from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, Edit
     CreateInvoiceForm, GetIDInvoiceForm, EditInvoiceInformationForm, CreateItemForm, GetIDItemForm, \
     EditItemInformationForm, CreateInvoiceLines, GetInvoiceLineIDForm, EditInvoiceLineInformation, ConfirmationForm
 
-from model import db, create_db, Users, Clients, Invoices, Items, InvoicesLines
+from model import db, create_db, Users, Clients, Invoices, Items, InvoicesLines, app
 from utils import check_if_item_exist, get_item_info
 
-app = Flask(__name__)
+
 app.config['SECRET_KEY'] = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
 Bootstrap(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/SimpleVoice'
