@@ -9,18 +9,9 @@ from forms import LogInForm, SignupForm, CreateClientForm, GetIDClientForm, Edit
     CreateInvoiceForm, GetIDInvoiceForm, EditInvoiceInformationForm, CreateItemForm, GetIDItemForm, \
     EditItemInformationForm, CreateInvoiceLines, GetInvoiceLineIDForm, EditInvoiceLineInformation, ConfirmationForm
 
-from model import db, create_db, Users, Clients, Invoices, Items, InvoicesLines, app
-from utils import check_if_item_exist, get_item_info
+from model import db, create_db, Users, Clients, Invoices, Items, InvoicesLines, app, engine, session
+from utils import check_if_item_exist, get_item_info, trigger_update_total
 
-
-app.config['SECRET_KEY'] = b'11d6841a9bbad1f9e44d19b03fb911a7fa8de044e7f3e1ae506827793088992c'
-Bootstrap(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/SimpleVoice'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-engine = sqlalchemy.create_engine('mysql://root:root@localhost/SimpleVoice')
-login_manager = LoginManager()
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = scoped_session(Session)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -400,6 +391,7 @@ def create_invoice_line():
                                                    quantity=form.quantity_1.data, user=current_user.id)
                     session.add(invoice_line_1)
                     session.commit()
+                    trigger_update_total(invoice_line_1.price * invoice_line_1.quantity, invoice_line_1.invoice_id)
                     flash('First line successfully added')
                 else:
                     flash('Problem adding first line')
@@ -411,6 +403,7 @@ def create_invoice_line():
                                                        quantity=form.quantity_2.data, user=current_user.id)
                         session.add(invoice_line_2)
                         session.commit()
+                        trigger_update_total(invoice_line_2.price * invoice_line_2.quantity, invoice_line_2.invoice_id)
                         flash('Second line successfully added')
                     else:
                         flash('Problem adding second line')
@@ -422,6 +415,7 @@ def create_invoice_line():
                                                        quantity=form.quantity_3.data, user=current_user.id)
                         session.add(invoice_line_3)
                         session.commit()
+                        trigger_update_total(invoice_line_3.price * invoice_line_3.quantity, invoice_line_3.invoice_id)
                         flash('Third line successfully added')
                     else:
                         flash('Problem adding third line')
@@ -467,6 +461,7 @@ def edit_invoice_line_information():
 def edit_invoice_line_information_update(invoice_id, item_id):
     invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
     form = EditInvoiceLineInformation()
+    old_total = invoice_line.quantity * invoice_line.price
     if form.item_name.data:
         invoice_line.item_name = form.item_name.data
     if form.quantity.data:
@@ -474,6 +469,7 @@ def edit_invoice_line_information_update(invoice_id, item_id):
     if form.item_price.data:
         invoice_line.price = form.item_price.data
     db.session.commit()
+    trigger_update_total((invoice_line.price * invoice_line.quantity)-old_total, invoice_line.invoice_id)
     flash("Invoice line updated")
     return redirect(url_for('home'))
 
@@ -517,10 +513,12 @@ def delete_invoice_line_confirmation():
 @login_required
 def delete_invoice_line_information_delete(invoice_id, item_id):
     invoice_line = InvoicesLines.query.filter_by(item_id=item_id, invoice_id=invoice_id).first()
+    total = -abs(invoice_line.quantity * invoice_line.price)
     if invoice_line.user == current_user.id:
         db.session.delete(invoice_line)
         db.session.commit()
         flash('Invoice line deleted')
+        trigger_update_total(total, invoice_id)
     else:
         flash('Problem deleting the invoice')
     return redirect(url_for('home'))
