@@ -21,7 +21,7 @@ app.config['MYSQL_DATABASE_PASSWORD'] = '8e7b1bf4'
 app.config['MYSQL_DATABASE_DB'] = 'heroku_b1ce9c50c117bec'
 app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-06.cleardb.net'
 engine = sqlalchemy.create_engine('mysql://bbdbc6ed170c04:8e7b1bf4@us-cdbr-east-06.cleardb.net/heroku_b1ce9c50c117bec',
-                                  pool_recycle=59)
+                                  pool_recycle=60)
 db = SQLAlchemy(app)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = scoped_session(Session)
