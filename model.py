@@ -22,13 +22,10 @@ app.config['MYSQL_DATABASE_PASSWORD'] = '8e7b1bf4'
 app.config['MYSQL_DATABASE_DB'] = 'heroku_b1ce9c50c117bec'
 app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-06.cleardb.net'
 engine = sqlalchemy.create_engine('mysql://bbdbc6ed170c04:8e7b1bf4@us-cdbr-east-06.cleardb.net/heroku_b1ce9c50c117bec',
-                                  pool_recycle=60)
-db = SQLAlchemy(app, engine_options={"pool_size": 10, "poolclass":QueuePool, "pool_pre_ping": True})
+                                  pool_recycle=60, pool_pre_ping=True, pool_size=10)
+db = SQLAlchemy(app)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = scoped_session(Session)
-session.execute('SET GLOBAL connect_timeout=59')
-session.execute('SET GLOBAL interactive_timeout=59')
-session.execute('SET GLOBAL wait_timeout=59')
 Bootstrap(app)
 
 
