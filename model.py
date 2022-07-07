@@ -26,6 +26,9 @@ engine = sqlalchemy.create_engine('mysql://bbdbc6ed170c04:8e7b1bf4@us-cdbr-east-
 db = SQLAlchemy(app, engine_options={"pool_size": 10, "poolclass":QueuePool, "pool_pre_ping": True})
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = scoped_session(Session)
+session.query('SET GLOBAL connect_timeout=59')
+session.query('SET GLOBAL interactive_timeout=59')
+session.query('SET GLOBAL wait_timeout=59')
 Bootstrap(app)
 
 
