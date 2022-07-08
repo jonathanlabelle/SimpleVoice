@@ -33,6 +33,14 @@ Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = scoped_session(Session)
 Bootstrap(app)
 
+
+@app.teardown_request
+def session_clear(exception=None):
+    Session.remove()
+    if exception and session.is_active:
+        Session.rollback()
+
+
 class Users(UserMixin, db.Model):
     __tablename__ = "Users"
     id = db.Column(db.Integer, primary_key=True)
