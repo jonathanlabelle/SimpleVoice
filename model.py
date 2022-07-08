@@ -36,9 +36,9 @@ Bootstrap(app)
 
 @app.teardown_request
 def session_clear(exception=None):
-    Session.remove()
+    session.remove()
     if exception and session.is_active:
-        Session.rollback()
+        session.rollback()
 
 
 class Users(UserMixin, db.Model):
