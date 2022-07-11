@@ -13,7 +13,7 @@
     <head>
     <meta charset="utf-8">
 </head>
-    <title>Document</title>
+    <title>Login - Simplevoice</title>
 </head>
 <body>
 {% block content %}
@@ -31,7 +31,15 @@
                   <img src="{{url_for('static', filename='logo.png')}}" style="width: 150px;" alt="logo">
                   <h4 class="mt-1 mb-5 pb-1">Simplevoice</h4>
                 </div>
-
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <ul class=flashes>
+                    {% for message in messages %}
+                      <li class="alert alert-warning">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
                 <form method="POST" action="/">
                   {{ form.csrf_token }}
                   <p>Please login to your account</p>

@@ -137,7 +137,6 @@ trigger_delete_invoice_line_total = "CREATE TRIGGER delete_invoice_line_total_tr
 
 
 def create_db():
-    #engine = sqlalchemy.create_engine('mysql://root:root@localhost')
     engine.execute("CREATE DATABASE IF NOT EXISTS heroku_b1ce9c50c117bec;")
     engine.execute("USE heroku_b1ce9c50c117bec;")
     db.create_all()
