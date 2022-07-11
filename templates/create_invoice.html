@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% block title%}Create invoice{% endblock %}
 {% block content %}
 
 <div class="row">
-    <div class="col-lg-6">
-        <div class="form-group col-lg-6">
+    <div class="col-sm-4">
+        <div class="form-group col-sm-10">
             <h1>Create Invoice</h1>
             <div class="form-outline">
                 <form method="POST" action="/create_invoice">
@@ -31,6 +32,30 @@
         <div class="right-panel col-lg-6">
 
         </div>
+    </div>
+     <div class="right-panel right-panel-table col-sm-8">
+            <div class="table-view-quick-access-invoices">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><h5>Clients</h5></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Client name</th>
+                            <th>Client ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td><a href="{{ url_for('view_client', client_id=client.client_id) }}">{{client.name}}</a></td>
+                            <td><a href="{{ url_for('view_client', client_id=client.client_id) }}">{{client.client_id}}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
     </div>
 </div>
 {% endblock %}

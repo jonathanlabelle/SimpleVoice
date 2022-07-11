@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField, FloatField, \
-    BooleanField
+from wtforms import StringField, PasswordField, SubmitField, validators, EmailField, IntegerField, FloatField
 from wtforms.validators import InputRequired, DataRequired, Length, EqualTo, Optional
 
 
@@ -8,7 +7,7 @@ class SignupForm(FlaskForm):
     companyName = StringField('companyName', validators=[DataRequired()])
     loginName = StringField('loginName', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, message='Password must be at least'
-                                                                                            ' 5 characters')])
+                                                                                           ' 5 characters')])
     confirm = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password',
                                                                                     message='Passwords do not match')])
     submit = SubmitField('Create account')

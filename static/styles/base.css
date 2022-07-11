@@ -423,6 +423,12 @@ a:hover {
     width: 150px;
 }
 
+#create-invoice-lines {
+    height:100%;
+    overflow: hidden;
+    overflow: scroll;
+}
+
 .gradient-custom-2 {
 /* fallback for old browsers */
 background: #fccb90;
