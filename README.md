@@ -1,4 +1,4 @@
-Simplevoice
+Simplevoice : https://simple-voice.herokuapp.com/
 
 How to use Simplevoice
 Simplevoice is a CRUD program that gives the user an interface to manipulate a database that is used for maintaining clients, items and invoices.
